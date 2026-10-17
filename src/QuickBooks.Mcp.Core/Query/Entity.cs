@@ -14,7 +14,7 @@ public sealed record Entity(string Name, bool IsTransaction)
         .. new[]
         {
             "Account", "BillingRate", "Class", "Currency", "Customer", "CustomerMsg", "CustomerType", "DateDrivenTerms",
-            "Employee", "Entity", "Item", "ItemDiscount", "ItemFixedAsset", "ItemGroup", "ItemInventory", "ItemInventoryAssembly", "ItemNonInventory", "ItemOtherCharge", "ItemPayment", "ItemSalesTax", "ItemSalesTaxGroup", "ItemService", "ItemSubtotal", "Lead", "JobType", "OtherName", "PaymentMethod", "PayrollItemNonWage",
+            "Employee", "Entity", "InventorySite", "Item", "ItemDiscount", "ItemFixedAsset", "ItemGroup", "ItemInventory", "ItemInventoryAssembly", "ItemNonInventory", "ItemOtherCharge", "ItemPayment", "ItemSalesTax", "ItemSalesTaxGroup", "ItemService", "ItemSubtotal", "Lead", "JobType", "OtherName", "PaymentMethod", "PayrollItemNonWage",
             "PayrollItemWage", "PriceLevel", "SalesRep", "SalesTaxCode", "ShipMethod", "StandardTerms", "ToDo",
             "UnitOfMeasureSet", "Vehicle", "Vendor", "VendorType", "Template", "WorkersCompCode",
         }.Select(n => new Entity(n, false)),
@@ -60,4 +60,7 @@ public sealed record Entity(string Name, bool IsTransaction)
 
     /// <summary>The element used to look a list item up by name, or null if it cannot be.</summary>
     public string? NameLookup => IsTransaction || Unfilterable || Name == "ToDo" ? null : Name == "Lead" ? "Name" : "FullName";
+
+    /// <summary>Whether the request accepts MaxReturned (inventory sites do not; the page is cut client-side).</summary>
+    public bool HasMaxReturned => Name != "InventorySite";
 }

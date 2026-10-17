@@ -45,3 +45,8 @@ short QuickBooks session; a failed item is reported and the rest continue unless
 Every create tool and every batch item accepts an `idempotencyKey`. The first success is remembered (next to the audit log,
 `idempotency.jsonl`); sending the same key with the same request again returns the first result instead of creating a second
 record, and reusing a key for a different request is refused. Dry runs never use up a key.
+
+## Inventory
+`create_inventory_record` and `update_inventory_record` cover InventorySite, InventoryAdjustment, TransferInventory and BuildAssembly.
+Reads: `search_inventory_sites`, `search_inventory_transactions`, `get_item_sites` (quantities per item and site) and
+`get_assemblies_can_build`. Inventory sites and per-site quantities need QuickBooks Enterprise with advanced inventory.

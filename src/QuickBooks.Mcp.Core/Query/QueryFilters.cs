@@ -81,7 +81,7 @@ public sealed class QueryFilters
         }
         else
         {
-            e.Add(new XElement("MaxReturned", maxReturned));
+            if (entity.HasMaxReturned) e.Add(new XElement("MaxReturned", maxReturned));
             if (entity.IsTransaction) AddTransactionFilters(e, entity);
             else AddListFilters(e, entity);
         }

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <InventoryAdjustmentAddRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <InventoryAdjustmentRet><Name>New InventoryAdjustment</Name><TxnID>4D-2000000001</TxnID></InventoryAdjustmentRet>
+  </InventoryAdjustmentAddRs>
+</QBXMLMsgsRs></QBXML>

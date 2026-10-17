@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <ItemSitesQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <ItemSitesRet>
+      <ListID>80000001-4000000001</ListID>
+      <EditSequence>5</EditSequence>
+      <Name>Example ItemSites</Name>
+      <QuantityOnHand>12</QuantityOnHand>
+    </ItemSitesRet>
+  </ItemSitesQueryRs>
+</QBXMLMsgsRs></QBXML>

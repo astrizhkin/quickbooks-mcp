@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <BuildAssemblyQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <BuildAssemblyRet>
+      <TxnID>4D-1000000001</TxnID>
+      <EditSequence>5</EditSequence>
+      <Name>Example BuildAssembly</Name>
+      <QuantityOnHand>12</QuantityOnHand>
+    </BuildAssemblyRet>
+  </BuildAssemblyQueryRs>
+</QBXMLMsgsRs></QBXML>

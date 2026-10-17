@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <TransferInventoryQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <TransferInventoryRet>
+      <TxnID>4D-1000000001</TxnID>
+      <EditSequence>5</EditSequence>
+      <Name>Example TransferInventory</Name>
+      <QuantityOnHand>12</QuantityOnHand>
+    </TransferInventoryRet>
+  </TransferInventoryQueryRs>
+</QBXMLMsgsRs></QBXML>

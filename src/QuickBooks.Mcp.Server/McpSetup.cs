@@ -24,7 +24,7 @@ public static class McpSetup
         {
             o.ServerInfo = new() { Name = "quickbooks-mcp", Version = "0.1.0" };
             o.ServerInstructions = Instructions;
-        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
+        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
         var gate = WriteGate.From(config);
         services.AddSingleton(gate);
@@ -34,7 +34,7 @@ public static class McpSetup
 
         services.AddSingleton<RecordWriter>();
         if (gate.Allows(WriteOp.Create) || gate.Allows(WriteOp.Update) || gate.Allows(WriteOp.Delete)) builder.WithTools<WriteSchemaTools>();
-        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(DeleteTools), typeof(BatchWriteTools));
+        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(InventoryWriteTools), typeof(DeleteTools), typeof(BatchWriteTools));
         return builder;
     }
 
