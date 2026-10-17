@@ -20,10 +20,12 @@ public sealed record WriteCall(WriteOp Op, string Entity, string Request, IReadO
 /// The single path every write tool takes: gate check, optional dry run, a two-step confirmation
 /// for deletes and voids, the call itself, and the audit entry.
 /// </summary>
-public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, IdempotencyStore? idempotency = null)
+public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, IdempotencyStore? idempotency = null, TimeProvider? time = null)
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromMinutes(5);
     private readonly ConcurrentDictionary<string, (string Hash, DateTimeOffset Expires)> _tokens = new();
+
+    private DateTimeOffset Now() => (time ?? TimeProvider.System).GetUtcNow();
 
     /// <summary>
     /// Runs <paramref name="call"/>. With <paramref name="dryRun"/> nothing is sent and the request is shown.
@@ -47,7 +49,7 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, 
             if (confirmationToken is null)
             {
                 var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-                _tokens[token] = (hash, DateTimeOffset.UtcNow + TokenLifetime);
+                _tokens[token] = (hash, Now() + TokenLifetime);
                 audit.Append("previewed", call.Op, call.Entity, hash, []);
                 return new JsonObject
                 {
@@ -58,7 +60,7 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, 
                 }.ToJsonString();
             }
 
-            if (!_tokens.TryRemove(confirmationToken, out var issued) || issued.Hash != hash || issued.Expires < DateTimeOffset.UtcNow)
+            if (!_tokens.TryRemove(confirmationToken, out var issued) || issued.Hash != hash || issued.Expires < Now())
                 throw new McpException("The confirmation token is invalid, expired or for a different request. Request a new preview.");
         }
 
