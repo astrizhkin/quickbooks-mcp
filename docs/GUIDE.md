@@ -106,7 +106,7 @@ Run `quickbooks-mcp.exe --doctor` (or `npx -y @devwithmj/quickbooks-mcp --doctor
 | "could not be started" / timeouts | QuickBooks is closed, busy updating or very slow | Open QuickBooks and the file; raise `QB_TIMEOUT_SECONDS` |
 | Company file `NOT FOUND` | Wrong path in `QB_COMPANY_FILE` | Use the full path including `.qbw` |
 
-QuickBooks and the server must run at the same Windows privilege level. If QuickBooks runs "as administrator", start the AI app as administrator too.
+QuickBooks and the server must run at the same Windows privilege level. `--doctor` has a "Run as admin" line and warns about a mismatch. If QuickBooks runs "as administrator", start the AI app as administrator too (or the reverse).
 
 ## 7. FAQ
 

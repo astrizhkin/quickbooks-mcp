@@ -34,6 +34,11 @@ public static class SetupCommands
             ? "Company file    : (none configured; the file open in QuickBooks will be used)"
             : $"Company file    : {file} ({(File.Exists(file) ? "found" : "NOT FOUND")})");
 
+        var quickBooks = Elevation.FindQuickBooks();
+        var serverElevated = Elevation.IsCurrentProcessElevated();
+        output.WriteLine($"Run as admin    : {(serverElevated ? "yes" : "no")} (this program); QuickBooks: {(quickBooks.Count == 0 ? "not running" : string.Join(", ", quickBooks.Select(q => q.Elevated is null ? "unknown" : q.Elevated.Value ? "yes" : "no")))}");
+        if (Elevation.Describe(serverElevated, quickBooks) is { } mismatch) output.WriteLine($"WARNING         : {mismatch}");
+
         if (!registered) return 1;
         return await ProbeAsync(options, output) ? 0 : 1;
     }
