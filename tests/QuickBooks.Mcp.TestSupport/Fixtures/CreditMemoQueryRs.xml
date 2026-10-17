@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <CreditMemoQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <CreditMemoRet>
+      <TxnID>1A-1000000001</TxnID>
+      <TxnDate>2025-01-15</TxnDate>
+      <RefNumber>1001</RefNumber>
+    </CreditMemoRet>
+  </CreditMemoQueryRs>
+</QBXMLMsgsRs></QBXML>
