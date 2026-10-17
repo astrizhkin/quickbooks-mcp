@@ -13,11 +13,23 @@ public static class ReportParser
     /// </summary>
     public static JsonObject Parse(XElement report)
     {
+        static string DataTypeName(string? qb) => qb switch
+        {
+            "AMTTYPE" => "amount",
+            "PERCENTTYPE" => "percent",
+            "QUANTYPE" => "quantity",
+            "DATETYPE" => "date",
+            "PRICETYPE" => "price",
+            "BOOLTYPE" => "boolean",
+            _ => "text",
+        };
+
         var columns = report.Elements("ColDesc").Select(c => new
         {
             Id = (int)c.Attribute("colID")!,
             Title = string.Join(" ", c.Elements("ColTitle").Select(t => (string?)t.Attribute("value")).Where(v => !string.IsNullOrWhiteSpace(v))),
             Type = (string?)c.Element("ColType") ?? "",
+            DataType = DataTypeName((string?)c.Attribute("dataType")),
         }).OrderBy(c => c.Id).ToList();
 
         var rows = new JsonArray();
@@ -59,6 +71,7 @@ public static class ReportParser
                 ["id"] = c.Id.ToString(CultureInfo.InvariantCulture),
                 ["title"] = c.Title,
                 ["type"] = c.Type,
+                ["dataType"] = c.DataType,
             }).ToArray()),
             ["rows"] = rows,
         };

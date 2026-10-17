@@ -82,3 +82,29 @@ public class ReportDocsTests
         Assert.Equal(["CustomSummaryReportType", "SummarizeRowsBy", "IncludeColumn"], names);
     }
 }
+
+public class ReportMarkdownTests
+{
+    [Fact]
+    public async Task Markdown_has_header_aligned_amounts_and_bold_totals()
+    {
+        var table = await new ReportRunner(new FixtureQbClient()).RunAsync("ARAgingSummary", new ReportOptions());
+
+        var md = ReportMarkdown.Render(table);
+
+        Assert.Contains("# A/R Aging Summary", md);
+        Assert.Contains("| Customer | Current | TOTAL |", md);
+        Assert.Contains("| --- | ---: | ---: |", md);
+        Assert.Contains("| Acme | 100.00 | 100.00 |", md);
+        Assert.Contains("| **TOTAL** | **100.00** | **100.00** |", md);
+        Assert.Contains("| *Other customers* |", md);
+    }
+
+    [Fact]
+    public async Task Columns_carry_a_data_type()
+    {
+        var table = await new ReportRunner(new FixtureQbClient()).RunAsync("ARAgingSummary", new ReportOptions());
+
+        Assert.Equal(["text", "amount", "amount"], table["columns"]!.AsArray().Select(c => (string?)c!["dataType"]));
+    }
+}

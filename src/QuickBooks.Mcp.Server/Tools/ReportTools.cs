@@ -16,8 +16,9 @@ public sealed class ReportTools(IQbClient qb)
         [Description("true for invoice-level detail, false (default) for one row per customer.")] bool detail = false,
         [Description("Age as of this date (yyyy-MM-dd); default today.")] string? asOfDate = null,
         [Description("Only these customers (full names).")] string[]? customers = null,
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
-        Aging(detail ? "ARAgingDetail" : "ARAgingSummary", asOfDate, customers, cancellationToken);
+        Aging(detail ? "ARAgingDetail" : "ARAgingSummary", asOfDate, customers, format, cancellationToken);
 
     /// <summary>Accounts payable aging.</summary>
     [McpServerTool(Name = "get_aged_payables", ReadOnly = true)]
@@ -26,8 +27,9 @@ public sealed class ReportTools(IQbClient qb)
         [Description("true for bill-level detail, false (default) for one row per vendor.")] bool detail = false,
         [Description("Age as of this date (yyyy-MM-dd); default today.")] string? asOfDate = null,
         [Description("Only these vendors (full names).")] string[]? vendors = null,
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
-        Aging(detail ? "APAgingDetail" : "APAgingSummary", asOfDate, vendors, cancellationToken);
+        Aging(detail ? "APAgingDetail" : "APAgingSummary", asOfDate, vendors, format, cancellationToken);
 
     /// <summary>Profit and loss.</summary>
     [McpServerTool(Name = "get_profit_and_loss", ReadOnly = true)]
@@ -39,6 +41,7 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Accrual or Cash; default is the company setting.")] string? basis = null,
         [Description("Standard (default), ByClass, ByJob, PrevYearComp or YTDComp.")] string layout = "Standard",
         [Description("Column grouping such as Month, Quarter, Year or TotalOnly.")] string? summarizeColumnsBy = null,
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
         Run("ProfitAndLoss" + layout, new ReportOptions
         {
@@ -47,7 +50,7 @@ public sealed class ReportTools(IQbClient qb)
             To = to,
             Basis = basis,
             SummarizeColumnsBy = summarizeColumnsBy,
-        }, cancellationToken);
+        }, format, cancellationToken);
 
     /// <summary>Balance sheet.</summary>
     [McpServerTool(Name = "get_balance_sheet", ReadOnly = true)]
@@ -57,8 +60,9 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Report as of this date (yyyy-MM-dd).")] string? to = null,
         [Description("Accrual or Cash.")] string? basis = null,
         [Description("Standard (default), Summary, PrevYearComp or ByClass.")] string layout = "Standard",
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
-        Run("BalanceSheet" + layout, new ReportOptions { DateMacro = dateMacro, To = to, Basis = basis }, cancellationToken);
+        Run("BalanceSheet" + layout, new ReportOptions { DateMacro = dateMacro, To = to, Basis = basis }, format, cancellationToken);
 
     /// <summary>Trial balance.</summary>
     [McpServerTool(Name = "get_trial_balance", ReadOnly = true)]
@@ -68,8 +72,9 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Period start (yyyy-MM-dd).")] string? from = null,
         [Description("Period end (yyyy-MM-dd).")] string? to = null,
         [Description("Accrual or Cash.")] string? basis = null,
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
-        Run("TrialBalance", new ReportOptions { DateMacro = dateMacro, From = from, To = to, Basis = basis }, cancellationToken);
+        Run("TrialBalance", new ReportOptions { DateMacro = dateMacro, From = from, To = to, Basis = basis }, format, cancellationToken);
 
     /// <summary>General ledger.</summary>
     [McpServerTool(Name = "get_general_ledger", ReadOnly = true)]
@@ -80,8 +85,9 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Period end (yyyy-MM-dd).")] string? to = null,
         [Description("Only these accounts (full names).")] string[]? accounts = null,
         [Description("Accrual or Cash.")] string? basis = null,
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
-        Run("GeneralLedger", new ReportOptions { DateMacro = dateMacro, From = from, To = to, Accounts = accounts, Basis = basis }, cancellationToken);
+        Run("GeneralLedger", new ReportOptions { DateMacro = dateMacro, From = from, To = to, Accounts = accounts, Basis = basis }, format, cancellationToken);
 
     /// <summary>Any other summary or detail report.</summary>
     [McpServerTool(Name = "get_report", ReadOnly = true)]
@@ -100,6 +106,7 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Posting, NonPosting or Either.")] string? postingStatus = null,
         [Description("Custom reports: row grouping such as Account, Customer, Item or Month.")] string? summarizeRowsBy = null,
         [Description("Detail and custom reports: extra columns such as Amount, Date, Memo, Name, Num, Balance.")] string[]? includeColumns = null,
+        [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
         Run(reportType, new ReportOptions
         {
@@ -115,9 +122,9 @@ public sealed class ReportTools(IQbClient qb)
             PostingStatus = postingStatus,
             SummarizeRowsBy = summarizeRowsBy,
             IncludeColumns = includeColumns,
-        }, cancellationToken);
+        }, format, cancellationToken);
 
-    private Task<string> Aging(string type, string? asOfDate, string[]? entities, CancellationToken cancellationToken) =>
+    private Task<string> Aging(string type, string? asOfDate, string[]? entities, string format, CancellationToken cancellationToken) =>
         Run(type, new ReportOptions
         {
             From = asOfDate,
@@ -125,9 +132,17 @@ public sealed class ReportTools(IQbClient qb)
             DateMacro = asOfDate is null ? "Today" : null,
             AgingAsOf = "ReportEndDate",
             Entities = entities,
-        }, cancellationToken);
+        }, format, cancellationToken);
 
-    private Task<string> Run(string type, ReportOptions options, CancellationToken cancellationToken) =>
+    private Task<string> Run(string type, ReportOptions options, string format, CancellationToken cancellationToken) =>
         ToolErrors.RunAsync(async () =>
-            (await new ReportRunner(qb).RunAsync(type, options, cancellationToken)).ToJsonString(new() { WriteIndented = true }));
+        {
+            var report = await new ReportRunner(qb).RunAsync(type, options, cancellationToken);
+            return format.ToLowerInvariant() switch
+            {
+                "json" => report.ToJsonString(new() { WriteIndented = true }),
+                "markdown" => ReportMarkdown.Render(report),
+                _ => throw new ArgumentException($"format must be json or markdown, not '{format}'."),
+            };
+        });
 }

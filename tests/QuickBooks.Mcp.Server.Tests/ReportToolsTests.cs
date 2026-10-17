@@ -92,3 +92,14 @@ public class CustomReportToolsTests
         Assert.Contains("IncludeColumn", qb.Requests[0].ToString());
     }
 }
+
+public class ReportFormatTests
+{
+    [Fact]
+    public async Task Markdown_format_returns_a_table() =>
+        Assert.Contains("| Customer |", await new ReportTools(new FixtureQbClient()).GetAgedReceivables(format: "markdown"));
+
+    [Fact]
+    public async Task Unknown_format_is_a_tool_error() =>
+        await ToolTestHelpers.RejectsAsync(() => new ReportTools(new FixtureQbClient()).GetAgedReceivables(format: "xml"));
+}
