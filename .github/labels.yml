@@ -1,0 +1,25 @@
+- { name: bug, color: d73a4a, description: Something is broken }
+- { name: enhancement, color: a2eeef, description: New feature or improvement }
+- { name: docs, color: 0075ca, description: Documentation }
+- { name: security, color: b60205, description: Security-relevant; do not discuss exploits in public }
+- { name: question, color: d876e3, description: Usage question }
+- { name: "area:core", color: 1d76db, description: qbXML, sessions, locking }
+- { name: "area:tools", color: 1d76db, description: MCP tools, resources, prompts }
+- { name: "area:reports", color: 1d76db, description: Reports }
+- { name: "area:writes", color: 1d76db, description: Create, update, delete, void }
+- { name: "area:packaging", color: 1d76db, description: npm, NuGet, bundle, release }
+- { name: "area:docs", color: 1d76db, description: Docs site and guides }
+- { name: needs-info, color: fbca04, description: Waiting for the reporter }
+- { name: confirmed, color: 0e8a16, description: Reproduced or accepted }
+- { name: blocked, color: 5319e7, description: Waiting on something external }
+- { name: wontfix, color: ffffff, description: Out of scope or declined }
+- { name: duplicate, color: cfd3d7, description: Already reported }
+- { name: p1, color: b60205, description: Data safety or cannot start }
+- { name: p2, color: d93f0b, description: A feature is broken }
+- { name: p3, color: fef2c0, description: Polish }
+- { name: good first issue, color: 7057ff, description: Good for newcomers }
+- { name: help wanted, color: 008672, description: PRs welcome }
+- { name: "qb:pro", color: c5def5, description: QuickBooks Pro }
+- { name: "qb:premier", color: c5def5, description: QuickBooks Premier }
+- { name: "qb:enterprise", color: c5def5, description: QuickBooks Enterprise }
+- { name: "qb:2022-or-older", color: c5def5, description: QuickBooks 2022 or older }
