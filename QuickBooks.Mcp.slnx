@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QuickBooks.Mcp.Core/QuickBooks.Mcp.Core.csproj" />
+    <Project Path="src/QuickBooks.Mcp.Server/QuickBooks.Mcp.Server.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QuickBooks.Mcp.Core.Tests/QuickBooks.Mcp.Core.Tests.csproj" />
+  </Folder>
+</Solution>
