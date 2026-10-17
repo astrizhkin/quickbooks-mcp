@@ -28,6 +28,7 @@ public sealed class ItemTools(IQbClient qb)
         [Description("Return only these fields, e.g. Name, QuantityOnHand.")] string[]? fields = null,
         [Description("Page size (default 50, max 500).")] int? maxResults = null,
         [Description("next_cursor from the previous call.")] string? cursor = null,
+        [Description("Also return custom fields (DataExt).")] bool includeCustomFields = false,
         CancellationToken cancellationToken = default)
     {
         var entity = itemType is null ? "Item" : itemType.StartsWith("Item", StringComparison.OrdinalIgnoreCase) ? itemType : "Item" + itemType;
@@ -41,6 +42,7 @@ public sealed class ItemTools(IQbClient qb)
                 Active = active,
                 ModifiedFrom = modifiedFrom,
                 Fields = fields,
+                IncludeCustomFields = includeCustomFields,
             },
             maxResults, cursor, cancellationToken);
     }

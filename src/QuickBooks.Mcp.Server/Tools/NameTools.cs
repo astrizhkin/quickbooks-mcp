@@ -21,8 +21,9 @@ public sealed class NameTools(IQbClient qb)
         [Description("Return only these fields, e.g. Name, Balance.")] string[]? fields = null,
         [Description("Page size (default 50, max 500).")] int? maxResults = null,
         [Description("next_cursor from the previous call.")] string? cursor = null,
+        [Description("Also return custom fields (DataExt).")] bool includeCustomFields = false,
         CancellationToken cancellationToken = default) =>
-        Names("Customer", nameContains, fullNames, ids, active, modifiedFrom, fields, maxResults, cursor, cancellationToken);
+        Names("Customer", nameContains, fullNames, ids, active, modifiedFrom, fields, includeCustomFields, maxResults, cursor, cancellationToken);
 
     /// <summary>Searches vendors.</summary>
     [McpServerTool(Name = "search_vendors", ReadOnly = true)]
@@ -36,8 +37,9 @@ public sealed class NameTools(IQbClient qb)
         [Description("Return only these fields.")] string[]? fields = null,
         [Description("Page size (default 50, max 500).")] int? maxResults = null,
         [Description("next_cursor from the previous call.")] string? cursor = null,
+        [Description("Also return custom fields (DataExt).")] bool includeCustomFields = false,
         CancellationToken cancellationToken = default) =>
-        Names("Vendor", nameContains, fullNames, ids, active, modifiedFrom, fields, maxResults, cursor, cancellationToken);
+        Names("Vendor", nameContains, fullNames, ids, active, modifiedFrom, fields, includeCustomFields, maxResults, cursor, cancellationToken);
 
     /// <summary>Searches employees.</summary>
     [McpServerTool(Name = "search_employees", ReadOnly = true)]
@@ -51,8 +53,9 @@ public sealed class NameTools(IQbClient qb)
         [Description("Return only these fields.")] string[]? fields = null,
         [Description("Page size (default 50, max 500).")] int? maxResults = null,
         [Description("next_cursor from the previous call.")] string? cursor = null,
+        [Description("Also return custom fields (DataExt).")] bool includeCustomFields = false,
         CancellationToken cancellationToken = default) =>
-        Names("Employee", nameContains, fullNames, ids, active, modifiedFrom, fields, maxResults, cursor, cancellationToken);
+        Names("Employee", nameContains, fullNames, ids, active, modifiedFrom, fields, includeCustomFields, maxResults, cursor, cancellationToken);
 
     /// <summary>Searches other names and leads.</summary>
     [McpServerTool(Name = "search_other_names", ReadOnly = true)]
@@ -85,7 +88,7 @@ public sealed class NameTools(IQbClient qb)
 
     private Task<string> Names(
         string entity, string? nameContains, string[]? fullNames, string[]? ids, string? active,
-        string? modifiedFrom, string[]? fields, int? maxResults, string? cursor, CancellationToken cancellationToken) =>
+        string? modifiedFrom, string[]? fields, bool includeCustomFields, int? maxResults, string? cursor, CancellationToken cancellationToken) =>
         Search.RunAsync(qb, entity, [entity],
             new QueryFilters
             {
@@ -95,6 +98,7 @@ public sealed class NameTools(IQbClient qb)
                 Active = active,
                 ModifiedFrom = modifiedFrom,
                 Fields = fields,
+                IncludeCustomFields = includeCustomFields,
             },
             maxResults, cursor, cancellationToken);
 }

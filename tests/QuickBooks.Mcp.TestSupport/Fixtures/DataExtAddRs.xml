@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <DataExtAddRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <DataExtRet><DataExtName>Region</DataExtName></DataExtRet>
+  </DataExtAddRs>
+</QBXMLMsgsRs></QBXML>

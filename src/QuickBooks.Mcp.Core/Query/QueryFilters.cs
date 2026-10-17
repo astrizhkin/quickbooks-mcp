@@ -45,6 +45,9 @@ public sealed class QueryFilters
     /// <summary>Include linked transactions (transactions only).</summary>
     public bool IncludeLinkedTxns { get; init; }
 
+    /// <summary>Also return custom fields (DataExt), for entities that have them.</summary>
+    public bool IncludeCustomFields { get; init; }
+
     /// <summary>Only return these fields (IncludeRetElement).</summary>
     public IReadOnlyList<string>? Fields { get; init; }
 
@@ -93,6 +96,11 @@ public sealed class QueryFilters
         }
 
         e.AddRange((Fields ?? []).Select(f => new XElement("IncludeRetElement", f)));
+        if (IncludeCustomFields)
+        {
+            if (!entity.HasOwnerId) throw new ArgumentException($"{entity.Name} has no custom fields.");
+            e.Add(new XElement("OwnerID", "0"));
+        }
         return e;
     }
 

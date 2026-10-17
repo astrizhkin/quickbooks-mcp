@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <SalesTaxPayableQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <SalesTaxPayableRet><TaxAgencyRef><FullName>State Board</FullName></TaxAgencyRef><Amount>125.00</Amount></SalesTaxPayableRet>
+  </SalesTaxPayableQueryRs>
+</QBXMLMsgsRs></QBXML>

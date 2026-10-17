@@ -100,3 +100,18 @@ public class ReportSchemaConformanceTests
         Assert.True(bad.Count == 0, string.Join(Environment.NewLine, bad));
     }
 }
+
+public class CustomFieldSchemaTests
+{
+    [RequiresSchemaFact]
+    public void Entities_that_claim_custom_fields_accept_owner_id()
+    {
+        var bad = Entity.All.Where(e => e.HasOwnerId && !e.Unfilterable)
+            .Select(e => (e.Name, Errors: QbXmlSchema.Validate(QbXmlRequest.Build(QbXmlSchema.Version, e.Request,
+                new QueryFilters { IncludeCustomFields = true }.ToElements(e, 5)))))
+            .Where(r => r.Errors.Count > 0)
+            .Select(r => r.Name);
+
+        Assert.True(!bad.Any(), "No custom fields: " + string.Join(", ", bad));
+    }
+}

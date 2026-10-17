@@ -63,4 +63,15 @@ public sealed record Entity(string Name, bool IsTransaction)
 
     /// <summary>Whether the request accepts MaxReturned (inventory sites do not; the page is cut client-side).</summary>
     public bool HasMaxReturned => Name != "InventorySite";
+
+    /// <summary>Whether the request accepts OwnerID, which asks for custom fields (DataExt).</summary>
+    public bool HasOwnerId => !NoOwnerId.Contains(Name);
+
+    private static readonly HashSet<string> NoOwnerId =
+    [
+        "BillingRate", "Class", "Currency", "CustomerMsg", "CustomerType", "DateDrivenTerms", "Entity", "InventorySite", "Lead", "JobType",
+        "PaymentMethod", "PayrollItemNonWage", "PayrollItemWage", "PriceLevel", "SalesRep", "SalesTaxCode", "ShipMethod", "StandardTerms",
+        "ToDo", "UnitOfMeasureSet", "Vehicle", "VendorType", "WorkersCompCode", "TimeTracking", "Transaction", "Transfer",
+        "TransferInventory", "VehicleMileage", "Template",
+    ];
 }

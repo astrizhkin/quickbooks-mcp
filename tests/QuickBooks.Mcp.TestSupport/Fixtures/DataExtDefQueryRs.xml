@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <DataExtDefQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <DataExtDefRet><OwnerID>0</OwnerID><DataExtName>Region</DataExtName><DataExtType>STR255TYPE</DataExtType><AssignToObject>Customer</AssignToObject></DataExtDefRet>
+  </DataExtDefQueryRs>
+</QBXMLMsgsRs></QBXML>

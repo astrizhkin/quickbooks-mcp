@@ -26,6 +26,7 @@ public sealed class SalesTools(IQbClient qb)
         [Description("Return only these fields, e.g. TxnDate, RefNumber, BalanceRemaining.")] string[]? fields = null,
         [Description("Page size (default 50, max 500).")] int? maxResults = null,
         [Description("next_cursor from the previous call.")] string? cursor = null,
+        [Description("Also return custom fields (DataExt).")] bool includeCustomFields = false,
         CancellationToken cancellationToken = default) =>
         Search.RunAsync(qb, type, Types,
             new QueryFilters
@@ -37,6 +38,7 @@ public sealed class SalesTools(IQbClient qb)
                 IncludeLineItems = includeLineItems,
                 IncludeLinkedTxns = includeLinkedTxns,
                 Fields = fields,
+                IncludeCustomFields = includeCustomFields,
             },
             maxResults, cursor, cancellationToken);
 }
