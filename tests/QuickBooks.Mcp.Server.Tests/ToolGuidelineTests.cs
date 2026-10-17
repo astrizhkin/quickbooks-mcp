@@ -6,13 +6,13 @@ namespace QuickBooks.Mcp.Server.Tests;
 /// <summary>Enforces docs/TOOL-GUIDELINES.md so the tool list stays small and predictable.</summary>
 public partial class ToolGuidelineTests
 {
-    private static readonly string[] Verbs = ["search", "query", "get", "create", "update", "delete", "void", "describe", "open"];
+    private static readonly string[] Verbs = ["search", "query", "get", "create", "update", "delete", "void", "merge", "describe", "open"];
 
     /// <summary>The most tools the server may have with everything enabled. Raise it on purpose, in a pull request that says why.</summary>
-    private const int MaxTools = 60;
+    private const int MaxTools = 65;
 
     /// <summary>The most tools a default (read-only) install may show a model.</summary>
-    private const int MaxDefaultTools = 40;
+    private const int MaxDefaultTools = 42;
 
     [GeneratedRegex(@"(?<=[.!?])\s+(?=[A-Z])")]
     private static partial Regex Sentences();
@@ -64,7 +64,7 @@ public partial class ToolGuidelineTests
 
     private static bool WriteGuard(string name) =>
         !(name.StartsWith("create_", StringComparison.Ordinal) || name.StartsWith("update_", StringComparison.Ordinal)
-          || name.StartsWith("delete_", StringComparison.Ordinal) || name.StartsWith("void_", StringComparison.Ordinal)
+          || name.StartsWith("delete_", StringComparison.Ordinal) || name.StartsWith("void_", StringComparison.Ordinal) || name.StartsWith("merge_", StringComparison.Ordinal)
           || name == "describe_write_fields");
 
     [Fact]

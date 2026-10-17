@@ -19,7 +19,7 @@ Rules for adding or changing MCP tools. Most are enforced by `ToolGuidelineTests
 - Prefer a generic path plus validation (the entity table, the generated write schema) over hand-written per-entity code.
 
 ## Tool count
-- Budget: at most **60 tools** with everything enabled and **40** in a default install (`ToolGuidelineTests` checks both). The current count is the first line of [TOOLS.md](TOOLS.md).
+- Budget: at most **65 tools** with everything enabled and **42** in a default install (`ToolGuidelineTests` checks both). The current count is the first line of [TOOLS.md](TOOLS.md).
 - Review the count before each release. If a change needs to raise the budget, say why in the pull request and change the number in the test in the same pull request.
 
 ## Adding a tool, checklist

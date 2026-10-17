@@ -63,9 +63,9 @@ public static class McpSetup
             // Progress belongs to the call, so every notification is sent before the result.
             await Task.WhenAll(pending);
             return result;
-        })).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithTools<DisplayTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
+        })).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<BarCodeTools>().WithTools<BillToPayTools>().WithTools<PaymentsToDepositTools>().WithTools<CompanyActivityTools>().WithTools<SalesTaxReturnTools>().WithTools<EventSubscriptionTools>().WithTools<HostTools>().WithTools<AccountTaxLineTools>().WithTools<ContractorTaxTools>().WithTools<ChangeTools>().WithTools<DisplayTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
-        if (config.AllowPayroll) builder.WithTools<PayrollTools>();
+        if (config.AllowPayroll) builder.WithTools<PayrollTools>().WithTools<PayrollPeriodTools>();
 
         var gate = WriteGate.From(config);
         services.AddSingleton(gate);
@@ -78,13 +78,13 @@ public static class McpSetup
 
         services.AddSingleton<RecordWriter>();
         if (gate.Allows(WriteOp.Create) || gate.Allows(WriteOp.Update) || gate.Allows(WriteOp.Delete)) builder.WithTools<WriteSchemaTools>();
-        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(InventoryWriteTools), typeof(ActivityWriteTools), typeof(CustomFieldWriteTools), typeof(DeleteTools), typeof(BatchWriteTools));
+        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(InventoryWriteTools), typeof(ActivityWriteTools), typeof(CustomFieldWriteTools), typeof(DeleteTools), typeof(MergeTools), typeof(EventSubscriptionWriteTools), typeof(BatchWriteTools));
         return builder;
     }
 
     /// <summary>
     /// Registers the tools of <paramref name="toolTypes"/> whose operation (from the create_, update_,
-    /// delete_ or void_ name prefix) is enabled in <paramref name="gate"/>; the others do not exist for the client.
+    /// delete_, void_ or merge_ name prefix) is enabled in <paramref name="gate"/>; the others do not exist for the client.
     /// </summary>
     public static IMcpServerBuilder AddWriteTools(this IMcpServerBuilder builder, WriteGate gate, params Type[] toolTypes) =>
         builder.WithTools(toolTypes.SelectMany(type => type.GetMethods()

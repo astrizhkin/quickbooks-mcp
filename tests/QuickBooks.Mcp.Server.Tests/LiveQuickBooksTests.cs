@@ -127,8 +127,10 @@ public sealed class LiveQuickBooksTests
     };
 
     // Not called: open_in_quickbooks changes what is on screen, payroll needs its own opt-in,
-    // get_assemblies_can_build and describe_write_fields are covered below.
-    private static readonly HashSet<string> Skipped = ["open_in_quickbooks", "get_payroll_report", "search_payroll_items", "get_assemblies_can_build", "describe_write_fields"];
+    // get_assemblies_can_build, get_bills_to_pay and describe_write_fields are covered below;
+    // get_event_subscriptions needs a subscriber GUID that only the registering application knows, and
+    // get_sales_tax_return_lines needs the name of a tax agency.
+    private static readonly HashSet<string> Skipped = ["open_in_quickbooks", "get_payroll_report", "search_payroll_items", "get_payroll_last_period", "get_assemblies_can_build", "get_bills_to_pay", "get_event_subscriptions", "get_sales_tax_return_lines", "describe_write_fields"];
 
     [LiveFact]
     public async Task Every_read_only_tool_works()
@@ -194,13 +196,26 @@ public sealed class LiveQuickBooksTests
     }
 
     [LiveFact]
+    public async Task Bills_to_pay_works_for_a_vendor()
+    {
+        await using var session = await StartAsync();
+        var (ok, text) = await CallAsync(session.Client, "search_vendors", new { maxResults = 1 });
+        Assert.True(ok, text);
+        var name = FirstFullName(text);
+        if (name is null) return; // the file has no vendors
+
+        var (paid, result) = await CallAsync(session.Client, "get_bills_to_pay", new { vendor = name });
+        Assert.True(paid, Short(result));
+    }
+
+    [LiveFact]
     public async Task Writes_are_off_by_default()
     {
         await using var session = await StartAsync();
         var names = (await session.Client.ListToolsAsync()).Select(t => t.Name).ToList();
 
         Assert.DoesNotContain(names, n => n.StartsWith("create_", StringComparison.Ordinal) || n.StartsWith("update_", StringComparison.Ordinal) ||
-                                          n.StartsWith("delete_", StringComparison.Ordinal) || n.StartsWith("void_", StringComparison.Ordinal));
+                                          n.StartsWith("delete_", StringComparison.Ordinal) || n.StartsWith("void_", StringComparison.Ordinal) || n.StartsWith("merge_", StringComparison.Ordinal));
         Assert.DoesNotContain("get_payroll_report", names);
     }
 

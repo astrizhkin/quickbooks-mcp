@@ -13,7 +13,7 @@ public enum WriteOp
     /// <summary>update_* tools.</summary>
     Update = 2,
 
-    /// <summary>delete_* and void_* tools.</summary>
+    /// <summary>delete_*, void_* and merge_* tools.</summary>
     Delete = 4,
 
     /// <summary>Everything.</summary>
@@ -28,7 +28,7 @@ public static class WriteOps
     {
         "create" => WriteOp.Create,
         "update" => WriteOp.Update,
-        "delete" or "void" => WriteOp.Delete,
+        "delete" or "void" or "merge" => WriteOp.Delete,
         _ => WriteOp.None,
     };
 }
