@@ -1,5 +1,27 @@
 # Releasing
 
+## Cutting a release
+1. Make sure `main` is green.
+2. See what the next version should be: `git cliff --bumped-version` (a `feat` bumps the minor version, a breaking change the major, anything else the patch; before 1.0 the breaking rule still applies, so use judgment).
+3. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+That is the whole manual part. One workflow (`.github/workflows/release.yml`) then does everything, in order:
+
+| Job | Result |
+|---|---|
+| `build` (x64, x86) | tests, single-file executables, checksums, build-provenance attestations |
+| `release` | GitHub release with release notes generated from Conventional Commits (`cliff.toml`) and the executables |
+| `npm` | `@devwithmj/quickbooks-mcp` launcher, with the release checksums, published with provenance |
+| `nuget` | `DevWithMJ.QuickBooks.Mcp` for `dnx` |
+| `mcpb` | `.mcpb` bundles attached to the release |
+| `registry` | publish to the official MCP Registry |
+
+Secrets needed: `NPM_TOKEN`, `NUGET_API_KEY`. The registry job uses GitHub OIDC and needs none.
+
+Commit titles are the changelog, so keep them in the form `type(scope): summary` (the repository already requires this). Types are grouped as
+Features (`feat`), Fixes (`fix`), Performance, Security, Documentation and Maintenance (`test`, `build`, `ci`, `chore`, `refactor`).
+To preview the notes: `git cliff --unreleased`. A `CHANGELOG.md` can be written with `git cliff -o CHANGELOG.md` if wanted; the release notes are the source of truth.
+
 Pushing a tag like `v0.2.0` runs `.github/workflows/release.yml`, which tests, then publishes two self-contained single-file builds
 and attaches them to a GitHub release with checksums:
 

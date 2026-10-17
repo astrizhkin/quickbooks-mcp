@@ -41,6 +41,16 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Release notes from Conventional Commits
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
       - uses: actions/download-artifact@v4
         with:
           path: dist
@@ -51,7 +61,7 @@ jobs:
         run: |
           cd dist
           cat *.sha256 > SHA256SUMS.txt
-          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes quickbooks-mcp-*.exe SHA256SUMS.txt
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --notes-file ../RELEASE_NOTES.md quickbooks-mcp-*.exe SHA256SUMS.txt
 
   npm:
     needs: release

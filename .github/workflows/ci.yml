@@ -28,3 +28,9 @@ jobs:
       - name: Test
         if: hashFiles('*.sln', '*.slnx') != ''
         run: dotnet test --no-build -c Release
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Launcher tests
+        working-directory: packaging/npm
+        run: npm test

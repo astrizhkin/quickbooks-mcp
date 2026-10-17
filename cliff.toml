@@ -1,0 +1,41 @@
+# Release notes and version bumps from Conventional Commits (https://git-cliff.org).
+[changelog]
+header = "# Changelog\n"
+body = """
+{% if version %}\
+## {{ version | trim_start_matches(pat="v") }} ({{ timestamp | date(format="%Y-%m-%d") }})
+{% else %}\
+## Unreleased
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}
+- {% if commit.scope %}**{{ commit.scope }}:** {% endif %}{{ commit.message | upper_first }}\
+{% if commit.breaking %} (**breaking**){% endif %}
+{% endfor %}
+{% endfor %}
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+protect_breaking_commits = true
+tag_pattern = "v[0-9].*"
+sort_commits = "oldest"
+# Squash merges end in " (#123)"; drop it from the line.
+commit_preprocessors = [{ pattern = ' \(#\d+\)$', replace = "" }]
+commit_parsers = [
+  { message = "^feat", group = "Features" },
+  { message = "^fix", group = "Fixes" },
+  { message = "^perf", group = "Performance" },
+  { message = "^security", group = "Security" },
+  { message = "^docs", group = "Documentation" },
+  { message = "^(test|build|ci|chore|refactor|style)", group = "Maintenance" },
+]
+
+[bump]
+features_always_bump_minor = true
+breaking_always_bump_major = true
+initial_tag = "v0.1.0"
