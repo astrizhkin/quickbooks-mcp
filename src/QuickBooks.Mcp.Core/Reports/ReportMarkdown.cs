@@ -35,5 +35,8 @@ public static class ReportMarkdown
         return sb.ToString();
     }
 
-    private static string Cell(string? text) => (text ?? "").Replace("|", "\\|").Replace("\n", " ");
+    // Cell text comes from QuickBooks records anyone may have typed into, so it must not become links, images or HTML.
+    private static string Cell(string? text) => (text ?? "")
+        .Replace("\\", "\\\\").Replace("|", "\\|").Replace("[", "\\[").Replace("]", "\\]").Replace("`", "\\`")
+        .Replace("<", "&lt;").Replace(">", "&gt;").Replace("\r", " ").Replace("\n", " ");
 }

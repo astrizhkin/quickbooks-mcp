@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
 using System.Xml.Linq;
+using QuickBooks.Mcp.Core.QbXml;
 
 namespace QuickBooks.Mcp.Core.Reports;
 
@@ -57,23 +58,25 @@ public static class ReportParser
             rows.Add(new JsonObject
             {
                 ["kind"] = kind,
-                ["cells"] = new JsonArray(columns.Select(c => (JsonNode)JsonValue.Create(cells[c.Id])!).ToArray()),
+                ["cells"] = new JsonArray(columns.Select(c => (JsonNode)JsonValue.Create(TextSanitizer.Clean(cells[c.Id]))!).ToArray()),
             });
         }
 
         return new JsonObject
         {
-            ["title"] = (string?)report.Element("ReportTitle"),
-            ["subtitle"] = (string?)report.Element("ReportSubtitle"),
+            ["title"] = Clean((string?)report.Element("ReportTitle")),
+            ["subtitle"] = Clean((string?)report.Element("ReportSubtitle")),
             ["basis"] = (string?)report.Element("ReportBasis"),
             ["columns"] = new JsonArray(columns.Select(c => (JsonNode)new JsonObject
             {
                 ["id"] = c.Id.ToString(CultureInfo.InvariantCulture),
-                ["title"] = c.Title,
+                ["title"] = TextSanitizer.Clean(c.Title),
                 ["type"] = c.Type,
                 ["dataType"] = c.DataType,
             }).ToArray()),
             ["rows"] = rows,
         };
     }
+
+    private static string? Clean(string? text) => text is null ? null : TextSanitizer.Clean(text);
 }

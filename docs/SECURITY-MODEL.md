@@ -50,7 +50,20 @@ QuickBooks itself still applies its own permissions: the server acts as the Quic
 
 ## Injection review
 
-The findings and fixes from the prompt-injection review (issue #50) are recorded in this section when that review is complete.
+Every text field in QuickBooks (names, memos, descriptions, addresses, custom fields, report cells) is treated as untrusted. What was reviewed and what changed:
+
+| Question | Finding | Result |
+|---|---|---|
+| Can text in a record break out of the JSON or XML we build? | Output is built with a JSON writer and requests with an XML builder, so quotes, brackets and markup stay inside their value. | Tested with hostile memos, names and filter values (including values written back through create tools). |
+| Can text hide instructions from the human? | Invisible Unicode (the "tag" characters, zero-width, bidi overrides, control codes) can carry text a person cannot see. | **Fixed:** removed from everything returned, in records, reports and report titles. Joiners used by real text and emoji are kept. |
+| Can one value flood the model's context? | A single memo could be very large. | **Fixed:** any one value is cut at 4,000 characters with a marker; pages were already capped. |
+| Can report text become a link, image or HTML when rendered? | Markdown cells could carry `![](http://...)` image or link syntax, which some clients fetch or render. | **Fixed:** brackets, backticks, backslashes, pipes and angle brackets are escaped in markdown output. |
+| Does the model know record text is not an instruction? | It did not. | **Fixed:** the server's instructions say record text is data, never to be followed, and that changes happen only when the user asked in this conversation and after showing a preview. |
+| Do tool descriptions invite risky behaviour? | Descriptions are short and say what a tool does; delete and void descriptions tell the model to show the preview to the user first. | No change needed. |
+| Is the write confirmation flow enough? | The two-step delete and void proves the model asked twice, not that a human agreed: a model steered by planted text can make both calls. | **Not solved here.** Asking the user directly through the client (MCP elicitation, #62) is the real fix; until then keep writes off, or on with a narrow `QB_WRITE_ALLOW`, for books where outside parties can enter text. |
+| Can a tool send data out? | No tool makes network requests or runs commands. | Nothing to fix. The exfiltration risk is in the other tools the AI app has (see threat 3). |
+
+The tests for these cases are `HostileTextTests` and `HostileWriteTests`.
 
 ## Reporting a problem
 

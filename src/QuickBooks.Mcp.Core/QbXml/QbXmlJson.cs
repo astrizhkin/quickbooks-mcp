@@ -13,7 +13,7 @@ public static class QbXmlJson
     /// </summary>
     public static JsonNode ToNode(XElement element)
     {
-        if (!element.HasElements) return JsonValue.Create(element.Value)!;
+        if (!element.HasElements) return JsonValue.Create(TextSanitizer.Clean(element.Value))!;
 
         var obj = new JsonObject();
         foreach (var group in element.Elements().GroupBy(e => e.Name.LocalName))

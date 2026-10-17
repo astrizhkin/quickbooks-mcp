@@ -32,8 +32,8 @@ public class ResultShapingTests
     [Fact]
     public async Task Oversized_pages_are_cut_with_a_cursor()
     {
-        var big = new string('x', 60_000);
-        var records = string.Concat(Enumerable.Range(0, 3).Select(i => $"<CustomerRet><Name>{big}</Name></CustomerRet>"));
+        var big = new string('x', 3_500);
+        var records = string.Concat(Enumerable.Range(0, 3).Select(i => $"<CustomerRet>{string.Concat(Enumerable.Range(0, 30).Select(j => $"<F{j}>{big}</F{j}>"))}</CustomerRet>"));
         var qb = new CannedClient($"""<QBXML><QBXMLMsgsRs><CustomerQueryRs statusCode="0">{records}</CustomerQueryRs></QBXMLMsgsRs></QBXML>""");
 
         var result = await new QueryRunner(qb).RunAsync(Entity.Find("Customer")!, new QueryFilters(), 10, null);
