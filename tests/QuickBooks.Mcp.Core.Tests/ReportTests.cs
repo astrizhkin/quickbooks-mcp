@@ -130,4 +130,26 @@ public class BudgetReportTests
         Assert.Equal(["BudgetSummaryReportType", "FiscalYear"],
             new ReportOptions { FiscalYear = 2025 }.ToElements(kind, type).Select(e => e.Name.LocalName));
     }
+
+    [Theory]
+    [InlineData("MissingChecks")]
+    [InlineData("JobProfitabilityDetail")]
+    [InlineData("JobEstimatesVsActualsDetail")]
+    [InlineData("CustomSummary")]
+    [InlineData("CustomTxnDetail")]
+    public void Reports_that_need_an_option_say_so_instead_of_letting_QuickBooks_reject_them(string reportType)
+    {
+        var (kind, type) = ReportKind.Find(reportType)!.Value;
+
+        Assert.Throws<ArgumentException>(() => new ReportOptions { DateMacro = "ThisYear" }.ToElements(kind, type));
+    }
+
+    [Fact]
+    public void The_physical_inventory_worksheet_takes_no_period()
+    {
+        var (kind, type) = ReportKind.Find("PhysicalInventoryWorksheet")!.Value;
+
+        Assert.Throws<ArgumentException>(() => new ReportOptions { DateMacro = "ThisYear" }.ToElements(kind, type));
+        Assert.Equal(["GeneralSummaryReportType"], new ReportOptions().ToElements(kind, type).Select(e => e.Name.LocalName));
+    }
 }

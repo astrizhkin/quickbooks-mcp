@@ -96,6 +96,19 @@ public sealed class ReportOptions
         Refuse(BudgetCriterion, budget, "budgetCriterion", type);
         if (budget && FiscalYear is null) throw new ArgumentException($"{type} needs fiscalYear, e.g. 2025.");
 
+        // QuickBooks answers these with a bare "missing element" or "cannot use element" status, so say what is needed.
+        if (type == "PhysicalInventoryWorksheet" && (DateMacro is not null || From is not null || To is not null))
+            throw new ArgumentException($"{type} does not take a period; leave out dateMacro, from and to.");
+        if (type == "MissingChecks" && Accounts is not { Count: > 0 })
+            throw new ArgumentException($"{type} needs accounts (the bank account to check).");
+        if (type is "JobEstimatesVsActualsDetail" or "JobProfitabilityDetail" && Entities is not { Count: > 0 })
+            throw new ArgumentException($"{type} needs names (a customer or job).");
+
+        if (request == "CustomSummaryReportQueryRq" && (SummarizeColumnsBy is null || SummarizeRowsBy is null))
+            throw new ArgumentException($"{type} needs summarizeColumnsBy and summarizeRowsBy.");
+        if (request == "CustomDetailReportQueryRq" && (SummarizeRowsBy is null || IncludeColumns is not { Count: > 0 }))
+            throw new ArgumentException($"{type} needs summarizeRowsBy and at least one includeColumns value.");
+
         var e = new List<XElement> { new(kind.TypeElement, type) };
         if (budget)
         {

@@ -81,7 +81,7 @@ public class ReportSchemaConformanceTests
         foreach (var kind in ReportKind.All.Concat(ReportKind.Payroll))
             foreach (var type in kind.Types)
             {
-                var options = kind.Request switch
+                var options = type == "PhysicalInventoryWorksheet" ? new ReportOptions() : kind.Request switch
                 {
                     "AgingReportQueryRq" => new ReportOptions { DateMacro = "ThisMonth", AgingAsOf = "ReportEndDate", Entities = ["Acme"], IncludeColumns = ["Amount"] },
                     "GeneralSummaryReportQueryRq" => new ReportOptions { From = "2025-01-01", To = "2025-03-31", Basis = "Accrual", SummarizeColumnsBy = "Month", Accounts = ["Checking"], Classes = ["East"], PostingStatus = "Posting" },

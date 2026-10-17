@@ -138,9 +138,25 @@ public sealed class LiveQuickBooksTests
         var failures = new List<string>();
         var total = 0;
 
+        // A few reports need a name to run for; use the first account and customer the file has.
+        var account = FirstProperty((await CallAsync(session.Client, "search_accounts", new { maxResults = 1 })).Text, "FullName");
+        var customer = FirstProperty((await CallAsync(session.Client, "search_customers", new { maxResults = 1 })).Text, "FullName");
+        object ReportCall(string type, object fallback) => type switch
+        {
+            "PhysicalInventoryWorksheet" => new { reportType = type },
+            "MissingChecks" => new { reportType = type, dateMacro = "ThisYearToDate", accounts = new[] { account } },
+            "JobEstimatesVsActualsDetail" or "JobProfitabilityDetail" => new { reportType = type, dateMacro = "ThisYearToDate", names = new[] { customer } },
+            "CustomSummary" => new { reportType = type, dateMacro = "ThisYearToDate", summarizeRowsBy = "Account", summarizeColumnsBy = "TotalOnly" },
+            "CustomTxnDetail" => new { reportType = type, dateMacro = "ThisYearToDate", summarizeRowsBy = "Account", includeColumns = new[] { "Amount" } },
+            _ => fallback,
+        };
+
         foreach (var tool in tools)
         {
-            foreach (var args in Calls.GetValueOrDefault(tool.Name) ?? [new { }])
+            var calls = Calls.GetValueOrDefault(tool.Name) ?? [new { }];
+            if (tool.Name == "get_report")
+                calls = [.. calls.Select(c => ReportCall(JsonSerializer.SerializeToElement(c).GetProperty("reportType").GetString()!, c))];
+            foreach (var args in calls)
             {
                 total++;
                 var (ok, text) = await CallAsync(session.Client, tool.Name, args);
