@@ -24,4 +24,10 @@ public sealed class QbOptions
 
     /// <summary>File mode used when opening <see cref="CompanyFile"/>.</summary>
     public QbFileMode Mode { get; init; } = QbFileMode.DoNotCare;
+
+    /// <summary>Total time allowed per call, including waiting for the file lock and retries.</summary>
+    public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(60);
+
+    /// <summary>How many times a failed COM call is retried (with backoff).</summary>
+    public int MaxRetries { get; init; } = 3;
 }
