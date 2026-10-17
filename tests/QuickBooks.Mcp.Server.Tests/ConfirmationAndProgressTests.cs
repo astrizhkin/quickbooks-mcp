@@ -202,7 +202,7 @@ public sealed class ConfirmationAndProgressTests : IDisposable
     [Fact]
     public async Task A_cancelled_call_stops_waiting_for_the_company_file()
     {
-        var options = new QbOptions { CompanyFile = $"x{Guid.NewGuid()}", Timeout = TimeSpan.FromSeconds(30) };
+        var options = new QbOptions { LockName = Guid.NewGuid().ToString(), Timeout = TimeSpan.FromSeconds(30) };
         var blocker = new LockingQbClient(new BlockingClient(), options);
         var waiter = new LockingQbClient(new FixtureQbClient(), options);
         var running = blocker.SendAsync(v => v);

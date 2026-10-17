@@ -134,3 +134,7 @@ QuickBooks and the server must run at the same Windows privilege level. `--docto
 ## 9. Multi-currency and older company files
 
 In a multi-currency company, each transaction carries its own currency (`CurrencyRef`) and exchange rate. Any search result that contains a foreign-currency record gets a `currency` block naming the home currency and how to read amounts: amounts on a record are in that record's currency, fields ending in `InHomeCurrency` are in the home currency, and reports are always in the home currency. Single-currency companies get no such block (and no extra request). Company files created in older QuickBooks years work as long as the installed QuickBooks can open them; features newer than that QuickBooks are refused with a message (see [COMPATIBILITY.md](COMPATIBILITY.md)).
+
+## 10. More than one company file
+
+Add one server entry per file, each with its own `QB_COMPANY_FILE` (and its own switches, so one can stay read-only). Calls to QuickBooks from all of them queue, because QuickBooks has only one file open at a time. A call for a file fails if someone has a different file open in the QuickBooks window; close it or switch to the file first. The reasoning is in [design/multiple-company-files.md](design/multiple-company-files.md).

@@ -25,6 +25,12 @@ public sealed class QbOptions
     /// <summary>File mode used when opening <see cref="CompanyFile"/>.</summary>
     public QbFileMode Mode { get; init; } = QbFileMode.DoNotCare;
 
+    /// <summary>
+    /// Names the lock that makes calls take turns. QuickBooks has one company file open per computer, so the default is one lock
+    /// for the whole machine; two servers configured for different files must not talk to QuickBooks at the same moment either.
+    /// </summary>
+    public string LockName { get; init; } = "default";
+
     /// <summary>Total time allowed per call, including waiting for the file lock and retries.</summary>
     public TimeSpan Timeout { get; init; } = TimeSpan.FromSeconds(60);
 

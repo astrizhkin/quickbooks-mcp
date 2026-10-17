@@ -11,7 +11,7 @@ namespace QuickBooks.Mcp.Core.Session;
 public sealed class LockingQbClient(IQbClient inner, QbOptions options) : IQbClient
 {
     private readonly string _mutexName = "Global\\quickbooks-mcp-" + Convert.ToHexString(
-        SHA256.HashData(Encoding.UTF8.GetBytes((options.CompanyFile ?? "").Trim().ToUpperInvariant())))[..16];
+        SHA256.HashData(Encoding.UTF8.GetBytes(options.LockName.Trim().ToUpperInvariant())))[..16];
 
     /// <inheritdoc />
     public Task<string> SendAsync(Func<string, string> buildRequest, CancellationToken cancellationToken = default)
