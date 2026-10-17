@@ -7,7 +7,6 @@ namespace QuickBooks.Mcp.Core.Session;
 /// Talks to the installed QuickBooks through late-bound COM (<c>QBXMLRP2.RequestProcessor</c>),
 /// so no interop assembly is shipped.
 /// </summary>
-[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 public sealed class ComQbClient(QbOptions options) : IQbClient
 {
     private const string ProgId = "QBXMLRP2.RequestProcessor";
