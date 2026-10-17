@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>quickbooks-mcp: QuickBooks Desktop for AI assistants</title>
+<meta name="description" content="Open-source MCP server that lets Claude and other AI apps read QuickBooks Desktop data on your own Windows PC. Read-only by default.">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f7f8fa; --fg: #14202e; --muted: #526173; --card: #ffffff; --line: #dde3ea;
+    --accent: #1f3a5f; --accent-fg: #ffffff; --code: #eef2f6; --warn: #8a5a00; --warn-bg: #fff6e0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1620; --fg: #e8eef5; --muted: #9db0c4; --card: #16212e; --line: #26364a;
+      --accent: #7fb0e8; --accent-fg: #0f1620; --code: #0c131b; --warn: #f2c66b; --warn-bg: #2a2110;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 56px 0 24px; }
+  header img { width: 64px; height: 64px; border-radius: 14px; }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.15; margin: 16px 0 8px; }
+  .lede { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+  .btn { display: inline-block; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--accent); text-decoration: none; font-weight: 600; }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); }
+  section { padding: 28px 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 1.4rem; margin: 0 0 12px; }
+  .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); }
+  pre, code { background: var(--code); border-radius: 6px; font: 0.9rem/1.5 ui-monospace, Consolas, monospace; }
+  code { padding: 1px 5px; }
+  pre { padding: 12px 14px; overflow-x: auto; margin: 8px 0 16px; }
+  pre code { padding: 0; background: none; }
+  .note { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 10px 14px; }
+  ol { padding-left: 1.2rem; }
+  footer { padding: 28px 0 56px; color: var(--muted); font-size: 0.9rem; }
+  .tag { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 0 10px; font-size: 0.85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img src="icon.svg" alt="">
+    <h1>Ask your AI about QuickBooks Desktop.</h1>
+    <p class="lede">An open-source <a href="https://modelcontextprotocol.io">MCP</a> server that lets Claude and other AI apps read your QuickBooks Desktop books on your own Windows PC. Read-only by default. Nothing leaves your computer except what the assistant is shown.</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/devwithmj/quickbooks-mcp/releases">Download</a>
+      <a class="btn" href="https://github.com/devwithmj/quickbooks-mcp">GitHub</a>
+      <a class="btn" href="https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/GUIDE.md">User guide</a>
+    </div>
+    <p><span class="tag">QuickBooks Desktop Pro, Premier, Enterprise</span> <span class="tag">Windows</span> <span class="tag">MIT license</span> <span class="tag">Not for QuickBooks Online</span></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2>What it does</h2>
+    <div class="grid">
+      <div class="card"><h3>Answers questions</h3><p>Customers, vendors, items, invoices, bills, inventory, time, and every standard report: aging, profit and loss, balance sheet and more, as tidy tables.</p></div>
+      <div class="card"><h3>Makes changes only if you allow it</h3><p>Creating, updating, deleting and voiding are separate switches. Previews, your approval for deletes, idempotency keys, and an audit log.</p></div>
+      <div class="card"><h3>Safe by default</h3><p>Read-only. Tax IDs, bank and card numbers masked. Payroll off. Card data never accepted. Text in your records is treated as data, not instructions.</p></div>
+      <div class="card"><h3>Local</h3><p>Runs next to QuickBooks through its own SDK. No cloud, no account, no telemetry.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Install</h2>
+    <p>Pick one.</p>
+    <p><strong>Claude Desktop:</strong> download the <code>.mcpb</code> from the <a href="https://github.com/devwithmj/quickbooks-mcp/releases">latest release</a> and open it.</p>
+    <p><strong>Any MCP app, with Node.js:</strong></p>
+    <pre><code>npx -y @devwithmj/quickbooks-mcp</code></pre>
+    <p><strong>With .NET 10:</strong></p>
+    <pre><code>dnx DevWithMJ.QuickBooks.Mcp --yes</code></pre>
+    <p><strong>Or</strong> run <code>quickbooks-mcp-win-x64.exe</code> from the release (use <code>-win-x86</code> if QuickBooks is 32-bit only).</p>
+    <p class="note">Package listings (npm, NuGet, the MCP Registry) go live with the first tagged release; until then use the GitHub release or build from source.</p>
+  </section>
+
+  <section>
+    <h2>Set up in five minutes</h2>
+    <ol>
+      <li>Open your company file in QuickBooks as an Admin, in single-user mode.</li>
+      <li>Run the server once with <code>--authorize</code> and choose <em>Yes, always; allow access even if QuickBooks is not running</em> in the dialog QuickBooks shows.</li>
+      <li>Add the server to your AI app (the guide has the exact snippet for Claude Desktop, Claude Code, VS Code and Cursor).</li>
+      <li>Ask: <em>"Show accounts receivable aging and the three customers who owe the most."</em></li>
+    </ol>
+    <p>Trouble? Run <code>--doctor</code>; the <a href="https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/GUIDE.md">guide</a> maps every message to a fix.</p>
+  </section>
+
+  <section>
+    <h2>Learn more</h2>
+    <ul>
+      <li><a href="https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/COOKBOOK.md">Prompt cookbook</a></li>
+      <li><a href="https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/TOOLS.md">Every tool and parameter</a></li>
+      <li><a href="https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/SECURITY-MODEL.md">Security and privacy model</a></li>
+      <li><a href="https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/COMPATIBILITY.md">Compatibility</a>: this project is pre-1.0 and not yet validated across QuickBooks versions</li>
+    </ul>
+    <p class="note">A demo video will be added once it can be recorded against Intuit's sample company file.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Not affiliated with or endorsed by Intuit. QuickBooks is a trademark of Intuit Inc.</div>
+</footer>
+</body>
+</html>
