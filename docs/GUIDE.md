@@ -123,3 +123,9 @@ QuickBooks and the server must run at the same Windows privilege level. `--docto
 **Where is my data sent?** Only to the AI app you connected, as tool results. The server has no telemetry and makes no network calls (the npx launcher downloads the release once).
 
 **How do I undo a change?** Look in the audit log for the record IDs, and fix them in QuickBooks (a voided transaction stays visible at zero). There is no automatic rollback; that is why changes are off by default.
+
+## 8. Logs and bug reports
+
+- **Logs** go to stderr (your AI app usually shows them in its MCP log view). Set `QB_LOG_LEVEL` (`Trace` ... `Critical`) and optionally `QB_LOG_FILE` to also write to a file. Logs say which request ran, how long it took and whether it worked, with QuickBooks error codes. They never contain the request or reply, so no company data, names or amounts. Detailed error text appears only at `Debug` level.
+- **Bug reports:** run `--diagnostics` and paste the output. It has versions, your settings (the company file by name only), and the `--doctor` checks. It contains no company data.
+- **No telemetry.** Nothing is sent anywhere unless a future version asks you to opt in first.
