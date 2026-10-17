@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <PreferencesQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <PreferencesRet>
+      <AccountingPreferences><IsUsingAccountNumbers>false</IsUsingAccountNumbers></AccountingPreferences>
+    </PreferencesRet>
+  </PreferencesQueryRs>
+</QBXMLMsgsRs></QBXML>

@@ -16,7 +16,7 @@ public sealed record Entity(string Name, bool IsTransaction)
             "Account", "BillingRate", "Class", "Currency", "Customer", "CustomerMsg", "CustomerType", "DateDrivenTerms",
             "Employee", "Item", "ItemSites", "JobType", "OtherName", "PaymentMethod", "PayrollItemNonWage",
             "PayrollItemWage", "PriceLevel", "SalesRep", "SalesTaxCode", "ShipMethod", "StandardTerms", "ToDo",
-            "UnitOfMeasureSet", "Vendor", "VendorType",
+            "UnitOfMeasureSet", "Vehicle", "Vendor", "VendorType", "Template", "WorkersCompCode",
         }.Select(n => new Entity(n, false)),
         .. new[]
         {

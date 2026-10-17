@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <AccountQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <AccountRet>
+      <ListID>80000001-1000000002</ListID>
+      <Name>Checking</Name>
+      <IsActive>true</IsActive>
+      <AccountType>Bank</AccountType>
+      <Balance>2500.00</Balance>
+    </AccountRet>
+  </AccountQueryRs>
+</QBXMLMsgsRs></QBXML>
