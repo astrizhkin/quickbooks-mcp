@@ -16,6 +16,12 @@ catch (ConfigException ex)
     return 2;
 }
 
+if (args.Contains("--tools-reference"))
+{
+    Console.Out.Write(ToolReference.Generate());
+    return 0;
+}
+
 if (args.Contains("--authorize")) return await SetupCommands.AuthorizeAsync(config.Qb, Console.Out);
 if (args.Contains("--doctor")) return await SetupCommands.DoctorAsync(config.Qb, Console.Out);
 
