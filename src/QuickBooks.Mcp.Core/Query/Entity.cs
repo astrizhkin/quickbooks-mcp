@@ -23,7 +23,7 @@ public sealed record Entity(string Name, bool IsTransaction)
             "ARRefundCreditCard", "Bill", "BillPaymentCheck", "BillPaymentCreditCard", "BuildAssembly", "Charge", "Check",
             "CreditCardCharge", "CreditCardCredit", "CreditMemo", "Deposit", "Estimate", "InventoryAdjustment",
             "Invoice", "ItemReceipt", "JournalEntry", "PurchaseOrder", "ReceivePayment", "SalesOrder", "SalesReceipt",
-            "SalesTaxPaymentCheck", "TimeTracking", "Transaction", "Transfer", "TransferInventory", "VendorCredit",
+            "SalesTaxPaymentCheck", "TimeTracking", "Transaction", "Transfer", "TransferInventory", "VehicleMileage", "VendorCredit",
         }.Select(n => new Entity(n, true)),
     ];
 
@@ -35,10 +35,10 @@ public sealed record Entity(string Name, bool IsTransaction)
     private static readonly HashSet<string> LinkedTxns =
         ["Invoice", "Estimate", "SalesOrder", "CreditMemo", "Charge", "PurchaseOrder", "Bill", "ItemReceipt", "VendorCredit", "Check"];
 
-    private static readonly HashSet<string> NoLineItems = ["Charge", "TimeTracking", "Transfer", "BuildAssembly", "Transaction"];
+    private static readonly HashSet<string> NoLineItems = ["Charge", "TimeTracking", "Transfer", "BuildAssembly", "Transaction", "VehicleMileage"];
     private static readonly HashSet<string> NoActiveStatus = ["BillingRate", "Lead"];
-    private static readonly HashSet<string> NoEntityFilter = ["BuildAssembly", "Transfer"];
-    private static readonly HashSet<string> NoAccountFilter = ["SalesOrder", "BuildAssembly", "Transfer", "TimeTracking"];
+    private static readonly HashSet<string> NoEntityFilter = ["BuildAssembly", "Transfer", "VehicleMileage"];
+    private static readonly HashSet<string> NoAccountFilter = ["SalesOrder", "BuildAssembly", "Transfer", "TimeTracking", "VehicleMileage"];
 
     /// <summary>Whether the request accepts IncludeLinkedTxns.</summary>
     public bool HasLinkedTxns => LinkedTxns.Contains(Name);

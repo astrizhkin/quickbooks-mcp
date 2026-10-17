@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <TimeTrackingQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <TimeTrackingRet>
+      <TxnID>5E-1000000001</TxnID>
+      <EditSequence>3</EditSequence>
+      <TxnDate>2025-02-03</TxnDate>
+      <Duration>PT2H30M</Duration>
+    </TimeTrackingRet>
+  </TimeTrackingQueryRs>
+</QBXMLMsgsRs></QBXML>

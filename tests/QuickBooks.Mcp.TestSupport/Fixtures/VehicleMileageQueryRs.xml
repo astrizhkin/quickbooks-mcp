@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <VehicleMileageQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <VehicleMileageRet>
+      <TxnID>5E-1000000001</TxnID>
+      <EditSequence>3</EditSequence>
+      <TxnDate>2025-02-03</TxnDate>
+      <TotalMiles>42</TotalMiles>
+    </VehicleMileageRet>
+  </VehicleMileageQueryRs>
+</QBXMLMsgsRs></QBXML>

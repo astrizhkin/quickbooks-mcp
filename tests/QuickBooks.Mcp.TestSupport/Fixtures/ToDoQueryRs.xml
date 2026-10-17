@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <ToDoQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <ToDoRet><ListID>80000001-5000000001</ListID><EditSequence>2</EditSequence><Notes>Call Acme</Notes><IsDone>false</IsDone></ToDoRet>
+  </ToDoQueryRs>
+</QBXMLMsgsRs></QBXML>

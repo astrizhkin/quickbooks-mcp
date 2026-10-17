@@ -12,7 +12,7 @@ namespace QuickBooks.Mcp.Server.Tools;
 public sealed class BatchWriteTools(RecordWriter writer)
 {
     private const int MaxItems = 50;
-    private static readonly string[] Entities = [.. ListWriteTools.Entities, .. SalesWriteTools.Entities, .. PurchaseWriteTools.Entities, .. InventoryWriteTools.Entities];
+    private static readonly string[] Entities = [.. ListWriteTools.Entities, .. SalesWriteTools.Entities, .. PurchaseWriteTools.Entities, .. InventoryWriteTools.Entities, .. ActivityWriteTools.Entities];
 
     /// <summary>Creates several records, reporting each outcome.</summary>
     [McpServerTool(Name = "create_records", ReadOnly = false, Destructive = false)]
