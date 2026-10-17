@@ -92,3 +92,33 @@ jobs:
         run: |
           dotnet pack src/QuickBooks.Mcp.Server -c Release -p:Version="${GITHUB_REF_NAME#v}" -o nupkg
           dotnet nuget push nupkg/*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+  mcpb:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        rid: [win-x64, win-x86]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.rid }}
+          path: dist
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pack the bundle and add it to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p stage/server
+          sed "s/__VERSION__/$version/" packaging/mcpb/manifest.json > stage/manifest.json
+          cp "dist/quickbooks-mcp-${{ matrix.rid }}.exe" stage/server/quickbooks-mcp.exe
+          cp README.md LICENSE stage/
+          npx -y @anthropic-ai/mcpb validate stage/manifest.json
+          npx -y @anthropic-ai/mcpb pack stage "quickbooks-mcp-${{ matrix.rid }}.mcpb"
+          gh release upload "$GITHUB_REF_NAME" "quickbooks-mcp-${{ matrix.rid }}.mcpb" --repo "$GITHUB_REPOSITORY"

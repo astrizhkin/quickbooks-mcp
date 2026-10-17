@@ -1,0 +1,65 @@
+{
+  "manifest_version": "0.3",
+  "name": "quickbooks-desktop",
+  "display_name": "QuickBooks Desktop",
+  "version": "__VERSION__",
+  "description": "Ask questions about your QuickBooks Desktop company file and, if you allow it, make safe changes.",
+  "long_description": "Connects Claude to QuickBooks Desktop (Pro, Premier or Enterprise) on this Windows computer. Read-only by default: customers, vendors, items, invoices, bills, reports and more. Turn on writes only when you want them. Before first use, open the company file in QuickBooks as an admin and run the server once with --authorize to allow access.",
+  "author": {
+    "name": "devwithmj",
+    "url": "https://github.com/devwithmj"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devwithmj/quickbooks-mcp"
+  },
+  "homepage": "https://github.com/devwithmj/quickbooks-mcp",
+  "documentation": "https://github.com/devwithmj/quickbooks-mcp#readme",
+  "support": "https://github.com/devwithmj/quickbooks-mcp/issues",
+  "license": "MIT",
+  "keywords": ["quickbooks", "accounting", "bookkeeping"],
+  "server": {
+    "type": "binary",
+    "entry_point": "server/quickbooks-mcp.exe",
+    "mcp_config": {
+      "command": "${__dirname}/server/quickbooks-mcp.exe",
+      "args": [],
+      "env": {
+        "QB_COMPANY_FILE": "${user_config.company_file}",
+        "QB_ALLOW_WRITES": "${user_config.allow_writes}",
+        "QB_ALLOW_PAYROLL": "${user_config.allow_payroll}",
+        "QB_REDACT": "${user_config.redact}"
+      }
+    }
+  },
+  "tools_generated": true,
+  "user_config": {
+    "company_file": {
+      "type": "file",
+      "title": "Company file",
+      "description": "The QuickBooks company file (.qbw). Leave empty to use whichever file is open in QuickBooks.",
+      "required": false
+    },
+    "allow_writes": {
+      "type": "boolean",
+      "title": "Allow changes",
+      "description": "Let Claude create, update, delete and void records. Off means read-only.",
+      "default": false
+    },
+    "allow_payroll": {
+      "type": "boolean",
+      "title": "Allow payroll data",
+      "description": "Let Claude see employee payroll details and payroll reports.",
+      "default": false
+    },
+    "redact": {
+      "type": "boolean",
+      "title": "Hide tax IDs and bank and card numbers",
+      "description": "Mask sensitive numbers in everything Claude sees. Recommended.",
+      "default": true
+    }
+  },
+  "compatibility": {
+    "platforms": ["win32"]
+  }
+}

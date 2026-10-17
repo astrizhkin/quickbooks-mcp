@@ -42,3 +42,11 @@ dnx DevWithMJ.QuickBooks.Mcp --yes
 This runs on the machine's .NET 10 runtime, so its bitness is the machine's `dotnet`. If QuickBooks only registers a 32-bit request
 processor, use the 32-bit .NET or the `win-x86` executable instead. Try a local package with
 `dotnet pack -o nupkg` then `dnx DevWithMJ.QuickBooks.Mcp --version <v> --source nupkg --yes -- --doctor`.
+
+## Desktop extension bundle (.mcpb)
+The `mcpb` job packs `packaging/mcpb/manifest.json` with each executable into `quickbooks-mcp-win-x64.mcpb` and `quickbooks-mcp-win-x86.mcpb`
+and adds them to the release. Install by opening the file in Claude Desktop (or dropping it on Settings > Extensions); the settings
+screen asks for the company file and whether to allow changes, payroll data and redaction, which map to `QB_COMPANY_FILE`, `QB_ALLOW_WRITES`,
+`QB_ALLOW_PAYROLL` and `QB_REDACT`. Use the x64 bundle unless QuickBooks is 32-bit only (`--doctor` shows what is registered).
+
+Pack locally with `npx @anthropic-ai/mcpb pack <staging dir> <out.mcpb>` after copying the executable to `<staging>/server/quickbooks-mcp.exe`.
