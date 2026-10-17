@@ -1,0 +1,13 @@
+# Decompiled vendor interop: local reference only, never redistribute
+/Source/
+Interop.QBFC*.dll
+
+bin/
+obj/
+node_modules/
+*.qbw
+*.qbw.*
+*.nd
+*.tlg
+*.ds
+.env
