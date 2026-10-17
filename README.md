@@ -51,6 +51,7 @@ Not for QuickBooks Online (Intuit has its own MCP server), QuickBooks for Mac (n
 - [Tools](docs/TOOLS.md): every tool, parameter and example
 - [Prompt cookbook](docs/COOKBOOK.md), [Writes](docs/WRITES.md) and [Reports](docs/REPORTS.md)
 - [Scope and non-goals](docs/SCOPE.md) and [security model](docs/SECURITY-MODEL.md)
+- [Roadmap](docs/ROADMAP.md) and [1.0 checklist](docs/RELEASE-1.0.md)
 - [Support, upgrades and uninstall](docs/SUPPORT.md), [Compatibility](docs/COMPATIBILITY.md), [Performance](docs/PERFORMANCE.md)
 - [Releasing](docs/RELEASING.md), [Testing](docs/TESTING.md), [Contributing](CONTRIBUTING.md)
 
