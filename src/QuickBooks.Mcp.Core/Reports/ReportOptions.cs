@@ -27,6 +27,12 @@ public sealed class ReportOptions
     /// <summary>Extra columns for detail and custom reports, e.g. Amount, Date, Memo, Name, Num, Balance.</summary>
     public IReadOnlyList<string>? IncludeColumns { get; init; }
 
+    /// <summary>Budget reports (required for them): the fiscal year, e.g. 2025.</summary>
+    public int? FiscalYear { get; init; }
+
+    /// <summary>Budget reports: Accounts, AccountsAndClasses or AccountsAndCustomers.</summary>
+    public string? BudgetCriterion { get; init; }
+
     /// <summary>Aging reports: ReportEndDate (default) or Today.</summary>
     public string? AgingAsOf { get; init; }
 
@@ -53,10 +59,47 @@ public sealed class ReportOptions
         "NextQuarter", "NextYear",
     ];
 
-    /// <summary>Builds the request children in the order the qbXML schema requires.</summary>
+    /// <summary>
+    /// Builds the request children in the order the qbXML schema requires. Each report family accepts
+    /// a different subset, and QuickBooks rejects a request with an element it does not know, so an
+    /// option the family does not support is refused with a clear message.
+    /// </summary>
     public List<XElement> ToElements(ReportKind kind, string type)
     {
+        var request = kind.Request;
+        var (account, posting, columnsBy, rowsBy, includeColumns, basis, agingAsOf) = request switch
+        {
+            "AgingReportQueryRq" => (true, true, false, false, true, false, true),
+            "GeneralSummaryReportQueryRq" => (true, true, true, false, false, true, false),
+            "GeneralDetailReportQueryRq" => (true, true, false, true, true, true, false),
+            "JobReportQueryRq" => (true, true, true, false, false, false, false),
+            "TimeReportQueryRq" => (false, false, true, false, true, false, false),
+            "BudgetSummaryReportQueryRq" => (false, false, true, true, false, false, false),
+            "CustomSummaryReportQueryRq" => (true, true, true, true, false, true, false),
+            _ => (true, true, false, true, true, true, false), // CustomDetailReportQueryRq
+        };
+
+        Refuse(Accounts, account, "accounts", type);
+        Refuse(PostingStatus, posting, "postingStatus", type);
+        Refuse(SummarizeColumnsBy, columnsBy, "summarizeColumnsBy", type);
+        Refuse(SummarizeRowsBy, rowsBy, "summarizeRowsBy", type);
+        Refuse(IncludeColumns, includeColumns, "includeColumns", type);
+        Refuse(Basis, basis, "basis", type);
+        Refuse(AgingAsOf, agingAsOf, "agingAsOf", type);
+        Refuse(Entities, request != "BudgetSummaryReportQueryRq", "names", type);
+        Refuse(Items, request != "BudgetSummaryReportQueryRq", "items", type);
+
+        var budget = request == "BudgetSummaryReportQueryRq";
+        Refuse(FiscalYear, budget, "fiscalYear", type);
+        Refuse(BudgetCriterion, budget, "budgetCriterion", type);
+        if (budget && FiscalYear is null) throw new ArgumentException($"{type} needs fiscalYear, e.g. 2025.");
+
         var e = new List<XElement> { new(kind.TypeElement, type) };
+        if (budget)
+        {
+            e.Add(new XElement("FiscalYear", FiscalYear));
+            if (BudgetCriterion is not null) e.Add(new XElement("BudgetCriterion", Pick(BudgetCriterion, ["Accounts", "AccountsAndClasses", "AccountsAndCustomers"], nameof(BudgetCriterion))));
+        }
 
         if (DateMacro is not null) e.Add(new XElement("ReportDateMacro", Pick(DateMacro, Macros, nameof(DateMacro))));
         else if (From is not null || To is not null)
@@ -70,20 +113,19 @@ public sealed class ReportOptions
         AddFilter(e, "ReportClassFilter", Classes);
         if (PostingStatus is not null) e.Add(new XElement("ReportPostingStatusFilter", Pick(PostingStatus, ["Posting", "NonPosting", "Either"], nameof(PostingStatus))));
 
-        var isAging = kind.Request == "AgingReportQueryRq";
-        if (isAging)
-        {
-            if (AgingAsOf is not null) e.Add(new XElement("ReportAgingAsOf", Pick(AgingAsOf, ["ReportEndDate", "Today"], nameof(AgingAsOf))));
-        }
-        else
-        {
-            if (Basis is not null) e.Add(new XElement("ReportBasis", Pick(Basis, ["Accrual", "Cash"], nameof(Basis))));
-            if (SummarizeColumnsBy is not null) e.Add(new XElement("SummarizeColumnsBy", SummarizeColumnsBy));
-            if (SummarizeRowsBy is not null) e.Add(new XElement("SummarizeRowsBy", SummarizeRowsBy));
-            e.AddRange((IncludeColumns ?? []).Select(c => new XElement("IncludeColumn", c)));
-        }
+        if (SummarizeColumnsBy is not null) e.Add(new XElement(budget ? "SummarizeBudgetColumnsBy" : "SummarizeColumnsBy", SummarizeColumnsBy));
+        if (SummarizeRowsBy is not null) e.Add(new XElement(budget ? "SummarizeBudgetRowsBy" : "SummarizeRowsBy", SummarizeRowsBy));
+        e.AddRange((IncludeColumns ?? []).Select(c => new XElement("IncludeColumn", c)));
+        if (AgingAsOf is not null) e.Add(new XElement("ReportAgingAsOf", Pick(AgingAsOf, ["ReportEndDate", "Today"], nameof(AgingAsOf))));
+        if (Basis is not null) e.Add(new XElement("ReportBasis", Pick(Basis, ["Accrual", "Cash"], nameof(Basis))));
 
         return e;
+    }
+
+    private static void Refuse(object? value, bool supported, string option, string type)
+    {
+        if (value is not null && !supported && !(value is IReadOnlyCollection<string> { Count: 0 }))
+            throw new ArgumentException($"{type} does not support {option}.");
     }
 
     private static void AddFilter(List<XElement> into, string name, IReadOnlyList<string>? fullNames)

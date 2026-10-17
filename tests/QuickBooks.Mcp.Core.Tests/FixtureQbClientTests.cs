@@ -18,5 +18,5 @@ public class FixtureQbClientTests
 
     [Fact]
     public async Task Unknown_request_fails_loudly() =>
-        await Assert.ThrowsAsync<FileNotFoundException>(() => new FixtureQbClient().SendAsync("NopeQueryRq"));
+        await Assert.ThrowsAsync<FileNotFoundException>(() => new FixtureQbClient().SendAsync("VehicleQueryRq"));
 }

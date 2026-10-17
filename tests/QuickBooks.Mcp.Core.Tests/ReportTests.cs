@@ -21,18 +21,28 @@ public class ReportTests
 
         var names = options.ToElements(kind, type).Select(e => e.Name.LocalName);
 
-        Assert.Equal(["GeneralSummaryReportType", "ReportPeriod", "ReportClassFilter", "ReportBasis", "SummarizeColumnsBy"], names);
+        Assert.Equal(["GeneralSummaryReportType", "ReportPeriod", "ReportClassFilter", "SummarizeColumnsBy", "ReportBasis"], names);
     }
 
     [Fact]
-    public void Aging_uses_as_of_not_basis()
+    public void Aging_uses_as_of_and_refuses_basis()
     {
         var (kind, type) = ReportKind.Find("ARAgingSummary")!.Value;
 
-        var names = new ReportOptions { DateMacro = "today", AgingAsOf = "ReportEndDate", Basis = "Cash" }
+        var names = new ReportOptions { DateMacro = "today", AgingAsOf = "ReportEndDate" }
             .ToElements(kind, type).Select(e => e.Name.LocalName);
 
         Assert.Equal(["AgingReportType", "ReportDateMacro", "ReportAgingAsOf"], names);
+    }
+
+    [Fact]
+    public void Options_a_report_family_lacks_are_refused()
+    {
+        var (aging, agingType) = ReportKind.Find("ARAgingSummary")!.Value;
+        var (detail, detailType) = ReportKind.Find("GeneralLedger")!.Value;
+
+        Assert.Throws<ArgumentException>(() => new ReportOptions { Basis = "Cash" }.ToElements(aging, agingType));
+        Assert.Throws<ArgumentException>(() => new ReportOptions { SummarizeColumnsBy = "Month" }.ToElements(detail, detailType));
     }
 
     [Fact]
@@ -74,12 +84,12 @@ public class ReportDocsTests
     [Fact]
     public void Custom_options_are_sent()
     {
-        var (kind, type) = ReportKind.Find("CustomSummary")!.Value;
+        var (kind, type) = ReportKind.Find("CustomTxnDetail")!.Value;
 
         var names = new ReportOptions { SummarizeRowsBy = "Account", IncludeColumns = ["Amount"] }
             .ToElements(kind, type).Select(e => e.Name.LocalName);
 
-        Assert.Equal(["CustomSummaryReportType", "SummarizeRowsBy", "IncludeColumn"], names);
+        Assert.Equal(["CustomDetailReportType", "SummarizeRowsBy", "IncludeColumn"], names);
     }
 }
 
@@ -106,5 +116,18 @@ public class ReportMarkdownTests
         var table = await new ReportRunner(new FixtureQbClient()).RunAsync("ARAgingSummary", new ReportOptions());
 
         Assert.Equal(["text", "amount", "amount"], table["columns"]!.AsArray().Select(c => (string?)c!["dataType"]));
+    }
+}
+
+public class BudgetReportTests
+{
+    [Fact]
+    public void Budget_reports_need_a_fiscal_year()
+    {
+        var (kind, type) = ReportKind.Find("ProfitAndLossBudgetVsActual")!.Value;
+
+        Assert.Throws<ArgumentException>(() => new ReportOptions { DateMacro = "ThisYear" }.ToElements(kind, type));
+        Assert.Equal(["BudgetSummaryReportType", "FiscalYear"],
+            new ReportOptions { FiscalYear = 2025 }.ToElements(kind, type).Select(e => e.Name.LocalName));
     }
 }

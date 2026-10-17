@@ -83,7 +83,8 @@ public sealed class WriteExecutorTests : IDisposable
     [Fact]
     public async Task Failures_are_audited()
     {
-        var call = new WriteCall(WriteOp.Create, "Nothing", "NothingAddRq", [new XElement("NothingAdd")]);
+        var call = new WriteCall(WriteOp.Update, "Customer", "CustomerModRq",
+            [new XElement("CustomerMod", new XElement("ListID", "8000-1"), new XElement("EditSequence", "1"))]);
 
         await Assert.ThrowsAsync<FileNotFoundException>(() => Executor().ExecuteAsync(call, false, null, default));
 

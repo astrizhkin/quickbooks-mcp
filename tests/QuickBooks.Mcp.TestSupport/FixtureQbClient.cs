@@ -20,7 +20,12 @@ public sealed class FixtureQbClient : IQbClient
     /// <inheritdoc />
     public Task<string> SendAsync(Func<string, string> buildRequest, CancellationToken cancellationToken = default)
     {
-        var request = XDocument.Parse(buildRequest(Version));
+        var xml = buildRequest(Version);
+        // Every request any tool sends is checked against Intuit's schema when it is installed.
+        if (QbXmlSchema.Available && QbXmlSchema.Validate(xml) is { Count: > 0 } errors)
+            throw new InvalidOperationException("Request does not match the qbXML schema: " + string.Join(" ", errors));
+
+        var request = XDocument.Parse(xml);
         Requests.Add(request);
 
         var name = request.Root!.Element("QBXMLMsgsRq")!.Elements().First().Name.LocalName;

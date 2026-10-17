@@ -55,3 +55,54 @@ public class QueryTests
     [Fact]
     public void Unknown_entity_is_not_found() => Assert.Null(Entity.Find("Nope"));
 }
+
+public class QueryRulesTests
+{
+    private static readonly Entity Customer = Entity.Find("Customer")!;
+    private static readonly Entity Invoice = Entity.Find("Invoice")!;
+
+    [Fact]
+    public void Lookup_by_id_sends_no_filters()
+    {
+        var names = new QueryFilters { Ids = ["8000-1"], Fields = ["Name"] }.ToElements(Customer, 51).Select(e => e.Name.LocalName);
+
+        Assert.Equal(["ListID", "IncludeRetElement"], names);
+    }
+
+    [Fact]
+    public void Lookup_cannot_be_mixed_with_filters() =>
+        Assert.Throws<ArgumentException>(() => new QueryFilters { Ids = ["1"], NameContains = "x" }.ToElements(Customer, 1));
+
+    [Fact]
+    public void Modified_and_transaction_dates_are_exclusive() =>
+        Assert.Throws<ArgumentException>(() => new QueryFilters { ModifiedFrom = "2025-01-01", TxnDateFrom = "2025-01-01" }.ToElements(Invoice, 1));
+
+    [Theory]
+    [InlineData("Check", true)]
+    [InlineData("CreditCardCharge", false)]
+    public void Linked_transactions_only_where_supported(string entity, bool supported)
+    {
+        var filters = new QueryFilters { IncludeLinkedTxns = true };
+
+        if (supported) Assert.Contains(filters.ToElements(Entity.Find(entity)!, 1), e => e.Name == "IncludeLinkedTxns");
+        else Assert.Throws<ArgumentException>(() => filters.ToElements(Entity.Find(entity)!, 1));
+    }
+
+    [Fact]
+    public void Lead_is_looked_up_by_name_and_has_no_active_status()
+    {
+        var lead = Entity.Find("Lead")!;
+
+        Assert.Equal("Name", new QueryFilters { FullNames = ["Pat"] }.ToElements(lead, 1).Single().Name.LocalName);
+        Assert.DoesNotContain(new QueryFilters().ToElements(lead, 1), e => e.Name == "ActiveStatus");
+    }
+
+    [Fact]
+    public void Templates_can_only_be_listed()
+    {
+        var template = Entity.Find("Template")!;
+
+        Assert.Empty(new QueryFilters().ToElements(template, 1));
+        Assert.Throws<ArgumentException>(() => new QueryFilters { NameContains = "x" }.ToElements(template, 1));
+    }
+}

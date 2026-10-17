@@ -105,6 +105,8 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Only these classes (full names).")] string[]? classes = null,
         [Description("Posting, NonPosting or Either.")] string? postingStatus = null,
         [Description("Custom reports: row grouping such as Account, Customer, Item or Month.")] string? summarizeRowsBy = null,
+        [Description("Budget reports (required for them): fiscal year, e.g. 2025.")] int? fiscalYear = null,
+        [Description("Budget reports: Accounts, AccountsAndClasses or AccountsAndCustomers.")] string? budgetCriterion = null,
         [Description("Detail and custom reports: extra columns such as Amount, Date, Memo, Name, Num, Balance.")] string[]? includeColumns = null,
         [Description("json (default) or markdown table.")] string format = "json",
         CancellationToken cancellationToken = default) =>
@@ -122,6 +124,8 @@ public sealed class ReportTools(IQbClient qb)
             PostingStatus = postingStatus,
             SummarizeRowsBy = summarizeRowsBy,
             IncludeColumns = includeColumns,
+            FiscalYear = fiscalYear,
+            BudgetCriterion = budgetCriterion,
         }, format, cancellationToken);
 
     private Task<string> Aging(string type, string? asOfDate, string[]? entities, string format, CancellationToken cancellationToken) =>

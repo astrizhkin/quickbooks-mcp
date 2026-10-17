@@ -14,7 +14,8 @@ Results are tables: `columns` (id, title, type) and `rows` (`kind` is data, subt
 | `basis` | Accrual or Cash |
 | `summarizeColumnsBy` | Column grouping, e.g. Month, Quarter, Year, Customer, Class, Vendor, TotalOnly |
 | `summarizeRowsBy` | Custom reports: row grouping |
-| `includeColumns` | Detail and custom reports: extra columns |
+| `includeColumns` | Detail, aging, time and custom detail reports: extra columns |
+| `fiscalYear`, `budgetCriterion` | Budget reports (`fiscalYear` is required) |
 | `accounts`, `names`, `items`, `classes` | Filters by full name |
 | `postingStatus` | Posting, NonPosting or Either |
 
@@ -38,5 +39,7 @@ BalanceSheetBudgetOverview, BalanceSheetBudgetVsActual, ProfitAndLossBudgetOverv
 
 ## Custom
 CustomSummary (use `summarizeColumnsBy` and `summarizeRowsBy`), CustomTxnDetail (use `includeColumns`)
+
+Each report family accepts only some options (for example detail reports have no `summarizeColumnsBy`, aging reports no `basis`); an unsupported option is refused with a message naming it.
 
 Not available: a cash-flow statement (QuickBooks' SDK has no such report type) and payroll reports (see the payroll tools).
