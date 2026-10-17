@@ -2,7 +2,7 @@
 
 ## Setup
 - Windows, .NET SDK 10, and QuickBooks Desktop (only needed for integration tests).
-- `dotnet build` and `dotnet test`. Integration tests run only when `QB_COMPANY_FILE` is set.
+- `dotnet build` and `dotnet test` (full steps: [docs/BUILDING.md](docs/BUILDING.md)). Integration tests run only when `QB_COMPANY_FILE` is set.
 
 ## Workflow
 1. Branch from `main` (`git checkout --no-track -b type/short-name`). Never commit to `main`.
