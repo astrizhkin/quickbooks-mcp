@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.devwithmj/quickbooks-mcp",
+  "title": "QuickBooks Desktop",
+  "description": "Read QuickBooks Desktop data and, if enabled, make safe changes. Windows only.",
+  "version": "__VERSION__",
+  "websiteUrl": "https://github.com/devwithmj/quickbooks-mcp",
+  "repository": {
+    "url": "https://github.com/devwithmj/quickbooks-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@devwithmj/quickbooks-mcp",
+      "version": "__VERSION__",
+      "runtimeHint": "npx",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "QB_COMPANY_FILE",
+          "description": "Full path to the QuickBooks company file (.qbw). Leave empty to use the file open in QuickBooks.",
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "registryType": "nuget",
+      "registryBaseUrl": "https://api.nuget.org",
+      "identifier": "DevWithMJ.QuickBooks.Mcp",
+      "version": "__VERSION__",
+      "runtimeHint": "dnx",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "QB_COMPANY_FILE",
+          "description": "Full path to the QuickBooks company file (.qbw). Leave empty to use the file open in QuickBooks.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

@@ -23,3 +23,5 @@ Not affiliated with or endorsed by Intuit. See [NOTICE.md](NOTICE.md).
 ## License
 
 MIT
+
+<!-- mcp-name: io.github.devwithmj/quickbooks-mcp -->

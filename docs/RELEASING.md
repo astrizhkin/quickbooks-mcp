@@ -50,3 +50,9 @@ screen asks for the company file and whether to allow changes, payroll data and 
 `QB_ALLOW_PAYROLL` and `QB_REDACT`. Use the x64 bundle unless QuickBooks is 32-bit only (`--doctor` shows what is registered).
 
 Pack locally with `npx @anthropic-ai/mcpb pack <staging dir> <out.mcpb>` after copying the executable to `<staging>/server/quickbooks-mcp.exe`.
+
+## MCP Registry
+The last job, `registry`, runs after npm, NuGet and the bundles exist. It stamps the release version into the root `server.json`, adds the two
+`.mcpb` bundles with their SHA-256, and publishes with `mcp-publisher` using GitHub OIDC (no secret). The server name is
+`io.github.devwithmj/quickbooks-mcp`; ownership is proved by `mcpName` in the npm package and the `mcp-name:` comment in the README
+(which is also the NuGet package readme). To check `server.json` by hand: `mcp-publisher validate` (or publish to a test registry).

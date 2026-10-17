@@ -122,3 +122,35 @@ jobs:
           npx -y @anthropic-ai/mcpb validate stage/manifest.json
           npx -y @anthropic-ai/mcpb pack stage "quickbooks-mcp-${{ matrix.rid }}.mcpb"
           gh release upload "$GITHUB_REF_NAME" "quickbooks-mcp-${{ matrix.rid }}.mcpb" --repo "$GITHUB_REPOSITORY"
+
+  registry:
+    needs: [npm, nuget, mcpb]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build server.json for this release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --pattern '*.mcpb'
+          jq --arg v "$version" '.version = $v | .packages |= map(.version = $v)' server.json > server.tmp
+          for rid in win-x64 win-x86; do
+            file="quickbooks-mcp-$rid.mcpb"
+            sha=$(sha256sum "$file" | cut -d' ' -f1)
+            jq --arg url "https://github.com/$GITHUB_REPOSITORY/releases/download/$GITHUB_REF_NAME/$file" --arg sha "$sha" \
+              '.packages += [{registryType: "mcpb", identifier: $url, fileSha256: $sha, transport: {type: "stdio"}}]' server.tmp > server.next
+            mv server.next server.tmp
+          done
+          mv server.tmp server.json
+          cat server.json
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+      - name: Publish to the MCP Registry
+        run: |
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish
