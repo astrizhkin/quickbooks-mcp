@@ -34,3 +34,8 @@ jobs:
       - name: Launcher tests
         working-directory: packaging/npm
         run: npm test
+      - name: License check (shipped packages)
+        shell: bash
+        run: |
+          dotnet tool install --global nuget-license
+          nuget-license -i src/QuickBooks.Mcp.Server/QuickBooks.Mcp.Server.csproj -t -a .github/allowed-licenses.json

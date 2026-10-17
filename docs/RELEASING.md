@@ -78,3 +78,9 @@ The last job, `registry`, runs after npm, NuGet and the bundles exist. It stamps
 `.mcpb` bundles with their SHA-256, and publishes with `mcp-publisher` using GitHub OIDC (no secret). The server name is
 `io.github.devwithmj/quickbooks-mcp`; ownership is proved by `mcpName` in the npm package and the `mcp-name:` comment in the README
 (which is also the NuGet package readme). To check `server.json` by hand: `mcp-publisher validate` (or publish to a test registry).
+
+## Dependency and code scanning
+- Dependabot opens weekly update PRs for NuGet, npm and GitHub Actions (`.github/dependabot.yml`).
+- CodeQL scans C# and the launcher's JavaScript on every PR, on `main`, and weekly.
+- CI fails if a shipped package uses a license outside `.github/allowed-licenses.json` (MIT, Apache-2.0, BSD, ISC, 0BSD). Test-only packages are not checked.
+- Each release carries a CycloneDX SBOM, `quickbooks-mcp.cdx.json`, produced by the `sbom` job.
