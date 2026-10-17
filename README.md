@@ -16,6 +16,10 @@ Open-source [MCP](https://modelcontextprotocol.io) server that connects **QuickB
 - Windows, QuickBooks Desktop installed and licensed.
 - Admin access to the company file for the one-time authorization.
 
+## Legal
+
+Not affiliated with or endorsed by Intuit. See [NOTICE.md](NOTICE.md).
+
 ## License
 
 MIT
