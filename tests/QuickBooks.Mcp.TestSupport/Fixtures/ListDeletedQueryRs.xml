@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <ListDeletedQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <ListDeletedRet><ListDelType>Customer</ListDelType><ListID>80000009-1000000009</ListID><TimeDeleted>2025-03-01T10:00:00</TimeDeleted><FullName>Gone Co</FullName></ListDeletedRet>
+  </ListDeletedQueryRs>
+</QBXMLMsgsRs></QBXML>

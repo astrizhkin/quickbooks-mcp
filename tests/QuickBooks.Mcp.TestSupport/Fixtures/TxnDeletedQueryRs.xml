@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <TxnDeletedQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <TxnDeletedRet><TxnDelType>Invoice</TxnDelType><TxnID>1A-9</TxnID><TimeDeleted>2025-03-01T10:00:00</TimeDeleted><RefNumber>1009</RefNumber></TxnDeletedRet>
+  </TxnDeletedQueryRs>
+</QBXMLMsgsRs></QBXML>

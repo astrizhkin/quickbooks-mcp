@@ -24,7 +24,7 @@ public static class McpSetup
         {
             o.ServerInfo = new() { Name = "quickbooks-mcp", Version = "0.1.0" };
             o.ServerInstructions = Instructions;
-        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
+        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
         if (config.AllowPayroll) builder.WithTools<PayrollTools>();
 

@@ -112,7 +112,7 @@ public sealed class QueryFilters
         var dated = TxnDateFrom is not null || TxnDateTo is not null;
         if (modified && dated && !all) throw new ArgumentException("Filter by modified date or by transaction date, not both.");
 
-        AddRange(e, all ? "TransactionModifiedDateRangeFilter" : "ModifiedDateRangeFilter", "FromModifiedDate", ModifiedFrom, "ToModifiedDate", ModifiedTo);
+        AddRange(e, all ? "TransactionModifiedDateRangeFilter" : "ModifiedDateRangeFilter", "FromModifiedDate", ModifiedFrom, "ToModifiedDate", ModifiedTo, timestamps: true);
         AddRange(e, all ? "TransactionDateRangeFilter" : "TxnDateRangeFilter", "FromTxnDate", TxnDateFrom, "ToTxnDate", TxnDateTo);
         if (EntityName is not null)
         {
@@ -151,8 +151,8 @@ public sealed class QueryFilters
             throw new ArgumentException($"{entity.Name} cannot be filtered by active status.");
         }
 
-        if (ModifiedFrom is not null) e.Add(new XElement("FromModifiedDate", Date(ModifiedFrom)));
-        if (ModifiedTo is not null) e.Add(new XElement("ToModifiedDate", Date(ModifiedTo)));
+        if (ModifiedFrom is not null) e.Add(new XElement("FromModifiedDate", Timestamp(ModifiedFrom)));
+        if (ModifiedTo is not null) e.Add(new XElement("ToModifiedDate", Timestamp(ModifiedTo)));
         if (NameContains is not null) e.Add(NameFilter("Contains", NameContains));
         else if (NameStartsWith is not null) e.Add(NameFilter("StartsWith", NameStartsWith));
     }
@@ -160,12 +160,12 @@ public sealed class QueryFilters
     private static XElement NameFilter(string criterion, string name) =>
         new("NameFilter", new XElement("MatchCriterion", criterion), new XElement("Name", name));
 
-    private static void AddRange(List<XElement> into, string wrapper, string fromName, string? from, string toName, string? to)
+    private static void AddRange(List<XElement> into, string wrapper, string fromName, string? from, string toName, string? to, bool timestamps = false)
     {
         if (from is null && to is null) return;
         var range = new XElement(wrapper);
-        if (from is not null) range.Add(new XElement(fromName, Date(from)));
-        if (to is not null) range.Add(new XElement(toName, Date(to)));
+        if (from is not null) range.Add(new XElement(fromName, timestamps ? Timestamp(from) : Date(from)));
+        if (to is not null) range.Add(new XElement(toName, timestamps ? Timestamp(to) : Date(to)));
         into.Add(range);
     }
 
@@ -173,4 +173,12 @@ public sealed class QueryFilters
         DateOnly.TryParse(text, CultureInfo.InvariantCulture, out var d)
             ? d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
             : throw new ArgumentException($"'{text}' is not a date; use yyyy-MM-dd.");
+
+    /// <summary>Formats a date or a date and time (yyyy-MM-dd or yyyy-MM-ddTHH:mm:ss) for QuickBooks' modified/deleted filters.</summary>
+    public static string Timestamp(string text) =>
+        text.Contains('T') || text.Contains(':')
+            ? DateTime.TryParse(text, CultureInfo.InvariantCulture, out var t)
+                ? t.ToString("yyyy-MM-dd'T'HH:mm:ss", CultureInfo.InvariantCulture)
+                : throw new ArgumentException($"'{text}' is not a date and time; use yyyy-MM-ddTHH:mm:ss.")
+            : Date(text);
 }
