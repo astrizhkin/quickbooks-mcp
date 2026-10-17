@@ -16,3 +16,6 @@
 
 ## Code
 Keep it simple; no speculative abstractions. One tool class per QuickBooks category. XML doc comments on public members.
+
+## Scope
+Before proposing a feature, read [docs/SCOPE.md](docs/SCOPE.md): QuickBooks Online, Mac, card processing and running as a Windows service are deliberately out of scope.

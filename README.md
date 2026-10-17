@@ -27,12 +27,14 @@ Then allow access once in QuickBooks (`--authorize`) and add the server to your 
 - Windows with QuickBooks Desktop installed and licensed.
 - Admin access to the company file for the one-time authorization.
 
+Not for QuickBooks Online (Intuit has its own MCP server), QuickBooks for Mac (no SDK), card processing, or running as a Windows service. See [docs/SCOPE.md](docs/SCOPE.md).
+
 ## Documentation
 
 - [User guide](docs/GUIDE.md): install, authorize, connect clients, troubleshoot, FAQ
 - [Tools](docs/TOOLS.md): every tool, parameter and example
 - [Writes](docs/WRITES.md) and [Reports](docs/REPORTS.md)
-- [Security model](docs/SECURITY-MODEL.md)
+- [Scope and non-goals](docs/SCOPE.md) and [security model](docs/SECURITY-MODEL.md)
 - [Releasing](docs/RELEASING.md), [Testing](docs/TESTING.md), [Contributing](CONTRIBUTING.md)
 
 ## Legal
