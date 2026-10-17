@@ -29,6 +29,90 @@ public sealed class ReportTools(IQbClient qb)
         CancellationToken cancellationToken = default) =>
         Aging(detail ? "APAgingDetail" : "APAgingSummary", asOfDate, vendors, cancellationToken);
 
+    /// <summary>Profit and loss.</summary>
+    [McpServerTool(Name = "get_profit_and_loss", ReadOnly = true)]
+    [Description("Get the profit and loss (income statement) for a period, optionally by month, class or job.")]
+    public Task<string> GetProfitAndLoss(
+        [Description("Period macro like ThisMonth, LastMonth, ThisQuarterToDate, ThisYearToDate, LastYear. Or use from/to.")] string? dateMacro = null,
+        [Description("Period start (yyyy-MM-dd).")] string? from = null,
+        [Description("Period end (yyyy-MM-dd).")] string? to = null,
+        [Description("Accrual or Cash; default is the company setting.")] string? basis = null,
+        [Description("Standard (default), ByClass, ByJob, PrevYearComp or YTDComp.")] string layout = "Standard",
+        [Description("Column grouping such as Month, Quarter, Year or TotalOnly.")] string? summarizeColumnsBy = null,
+        CancellationToken cancellationToken = default) =>
+        Run("ProfitAndLoss" + layout, new ReportOptions
+        {
+            DateMacro = dateMacro,
+            From = from,
+            To = to,
+            Basis = basis,
+            SummarizeColumnsBy = summarizeColumnsBy,
+        }, cancellationToken);
+
+    /// <summary>Balance sheet.</summary>
+    [McpServerTool(Name = "get_balance_sheet", ReadOnly = true)]
+    [Description("Get the balance sheet as of the end of a period.")]
+    public Task<string> GetBalanceSheet(
+        [Description("Period macro like ThisMonthToDate or LastYear. Or use to.")] string? dateMacro = null,
+        [Description("Report as of this date (yyyy-MM-dd).")] string? to = null,
+        [Description("Accrual or Cash.")] string? basis = null,
+        [Description("Standard (default), Summary, PrevYearComp or ByClass.")] string layout = "Standard",
+        CancellationToken cancellationToken = default) =>
+        Run("BalanceSheet" + layout, new ReportOptions { DateMacro = dateMacro, To = to, Basis = basis }, cancellationToken);
+
+    /// <summary>Trial balance.</summary>
+    [McpServerTool(Name = "get_trial_balance", ReadOnly = true)]
+    [Description("Get the trial balance for a period.")]
+    public Task<string> GetTrialBalance(
+        [Description("Period macro like ThisYearToDate. Or use from/to.")] string? dateMacro = null,
+        [Description("Period start (yyyy-MM-dd).")] string? from = null,
+        [Description("Period end (yyyy-MM-dd).")] string? to = null,
+        [Description("Accrual or Cash.")] string? basis = null,
+        CancellationToken cancellationToken = default) =>
+        Run("TrialBalance", new ReportOptions { DateMacro = dateMacro, From = from, To = to, Basis = basis }, cancellationToken);
+
+    /// <summary>General ledger.</summary>
+    [McpServerTool(Name = "get_general_ledger", ReadOnly = true)]
+    [Description("Get the general ledger (every posting by account) for a period. Can be large; filter by account.")]
+    public Task<string> GetGeneralLedger(
+        [Description("Period macro like LastMonth. Or use from/to.")] string? dateMacro = null,
+        [Description("Period start (yyyy-MM-dd).")] string? from = null,
+        [Description("Period end (yyyy-MM-dd).")] string? to = null,
+        [Description("Only these accounts (full names).")] string[]? accounts = null,
+        [Description("Accrual or Cash.")] string? basis = null,
+        CancellationToken cancellationToken = default) =>
+        Run("GeneralLedger", new ReportOptions { DateMacro = dateMacro, From = from, To = to, Accounts = accounts, Basis = basis }, cancellationToken);
+
+    /// <summary>Any other summary or detail report.</summary>
+    [McpServerTool(Name = "get_report", ReadOnly = true)]
+    [Description("Get any other QuickBooks report by type, e.g. SalesByCustomerSummary, CustomerBalanceSummary, VendorBalanceSummary, ExpenseByVendorSummary, SalesByItemDetail, OpenInvoices, TxnListByDate, JobProfitabilitySummary, TimeByName, ProfitAndLossBudgetVsActual.")]
+    public Task<string> GetReport(
+        [Description("Report type name; an unknown name returns the full list.")] string reportType,
+        [Description("Period macro like ThisMonth. Or use from/to.")] string? dateMacro = null,
+        [Description("Period start (yyyy-MM-dd).")] string? from = null,
+        [Description("Period end (yyyy-MM-dd).")] string? to = null,
+        [Description("Accrual or Cash.")] string? basis = null,
+        [Description("Column grouping such as Month, Customer, Class or TotalOnly.")] string? summarizeColumnsBy = null,
+        [Description("Only these accounts (full names).")] string[]? accounts = null,
+        [Description("Only these customers, vendors or employees (full names).")] string[]? names = null,
+        [Description("Only these items (full names).")] string[]? items = null,
+        [Description("Only these classes (full names).")] string[]? classes = null,
+        [Description("Posting, NonPosting or Either.")] string? postingStatus = null,
+        CancellationToken cancellationToken = default) =>
+        Run(reportType, new ReportOptions
+        {
+            DateMacro = dateMacro,
+            From = from,
+            To = to,
+            Basis = basis,
+            SummarizeColumnsBy = summarizeColumnsBy,
+            Accounts = accounts,
+            Entities = names,
+            Items = items,
+            Classes = classes,
+            PostingStatus = postingStatus,
+        }, cancellationToken);
+
     private Task<string> Aging(string type, string? asOfDate, string[]? entities, CancellationToken cancellationToken) =>
         Run(type, new ReportOptions
         {

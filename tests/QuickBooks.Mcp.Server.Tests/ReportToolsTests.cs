@@ -33,3 +33,48 @@ public class ReportToolsTests
     public async Task Bad_date_is_a_tool_error() =>
         await ToolTestHelpers.RejectsAsync(() => new ReportTools(new FixtureQbClient()).GetAgedReceivables(asOfDate: "soon"));
 }
+
+public class SummaryDetailReportToolsTests
+{
+    [Theory]
+    [InlineData("pnl", "GeneralSummaryReportQueryRq", "ProfitAndLossStandard")]
+    [InlineData("bs", "GeneralSummaryReportQueryRq", "BalanceSheetStandard")]
+    [InlineData("tb", "GeneralSummaryReportQueryRq", "TrialBalance")]
+    [InlineData("gl", "GeneralDetailReportQueryRq", "GeneralLedger")]
+    [InlineData("other", "GeneralSummaryReportQueryRq", "SalesByCustomerSummary")]
+    public async Task Each_tool_requests_its_report(string tool, string request, string type)
+    {
+        var qb = new FixtureQbClient();
+        var tools = new ReportTools(qb);
+
+        var json = await (tool switch
+        {
+            "pnl" => tools.GetProfitAndLoss("ThisMonth"),
+            "bs" => tools.GetBalanceSheet("ThisMonthToDate"),
+            "tb" => tools.GetTrialBalance("ThisYearToDate"),
+            "gl" => tools.GetGeneralLedger("LastMonth", accounts: ["Checking"]),
+            _ => tools.GetReport("SalesByCustomerSummary", "ThisYear", summarizeColumnsBy: "Month"),
+        });
+
+        Assert.Equal(request, qb.SentRequest());
+        Assert.Contains(type, qb.Requests[0].ToString());
+        Assert.Contains("Acme", json);
+    }
+
+    [Fact]
+    public async Task Unknown_report_lists_valid_names()
+    {
+        var ex = await ToolTestHelpers.RejectsAsync(() => new ReportTools(new FixtureQbClient()).GetReport("Nope"));
+        Assert.Contains("TrialBalance", ex.Message);
+    }
+
+    [Fact]
+    public async Task Layout_selects_the_variant()
+    {
+        var qb = new FixtureQbClient();
+
+        await new ReportTools(qb).GetProfitAndLoss("ThisYear", layout: "ByClass");
+
+        Assert.Contains("ProfitAndLossByClass", qb.Requests[0].ToString());
+    }
+}
