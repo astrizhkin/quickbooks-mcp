@@ -66,3 +66,14 @@ public class ModeAliasTests
     public void Modes_accept_short_names(string text, QuickBooks.Mcp.Core.Session.QbFileMode expected) =>
         Assert.Equal(expected, ServerConfig.Load([], new System.Collections.Hashtable { ["QB_MODE"] = text }).Qb.Mode);
 }
+
+public class CacheSettingTests
+{
+    [Fact]
+    public void The_cache_defaults_to_thirty_seconds_and_can_be_turned_off()
+    {
+        Assert.Equal(TimeSpan.FromSeconds(30), ServerConfig.Load([], new System.Collections.Hashtable()).CacheLifetime);
+        Assert.Equal(TimeSpan.Zero, ServerConfig.Load([], new System.Collections.Hashtable { ["QB_CACHE_SECONDS"] = "0" }).CacheLifetime);
+        Assert.Throws<ConfigException>(() => ServerConfig.Load([], new System.Collections.Hashtable { ["QB_CACHE_SECONDS"] = "-5" }));
+    }
+}

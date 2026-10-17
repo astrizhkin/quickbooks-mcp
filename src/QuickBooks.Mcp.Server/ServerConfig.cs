@@ -17,7 +17,7 @@ public sealed class ConfigException(string message) : Exception(message);
 public sealed class ServerConfig
 {
     private static readonly string[] Keys =
-        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL", "LOG_FILE"];
+        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL", "LOG_FILE", "CACHE_SECONDS"];
 
     /// <summary>Connection settings passed to the QuickBooks client.</summary>
     public required QbOptions Qb { get; init; }
@@ -39,6 +39,9 @@ public sealed class ServerConfig
 
     /// <summary>Minimum log level name (Trace..Critical).</summary>
     public string LogLevel { get; init; } = "Information";
+
+    /// <summary>How long replies for rarely-changing lists (accounts, items, classes...) are remembered. 0 turns the cache off.</summary>
+    public TimeSpan CacheLifetime { get; init; } = TimeSpan.FromSeconds(30);
 
     /// <summary>Optional file to append log lines to, besides stderr. Logs hold no company data.</summary>
     public string? LogFile { get; init; }
@@ -78,6 +81,7 @@ public sealed class ServerConfig
             AllowPayroll = ParseBool(values, "ALLOW_PAYROLL", fallback: false),
             AuditLogPath = values.GetValueOrDefault("AUDIT_LOG") ?? QuickBooks.Mcp.Server.Writes.AuditLog.DefaultPath,
             LogFile = values.GetValueOrDefault("LOG_FILE"),
+            CacheLifetime = TimeSpan.FromSeconds(ParseInt(values, "CACHE_SECONDS", 30, 0)),
             LogLevel = values.TryGetValue("LOG_LEVEL", out var level)
                 ? ParseEnum<LogLevelName>("LOG_LEVEL", level).ToString()
                 : "Information",

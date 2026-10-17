@@ -38,6 +38,7 @@ var locking = new LockingQbClient(new ComQbClient(config.Qb), config.Qb);
 builder.Services.AddSingleton<IQbClient>(sp =>
 {
     IQbClient qb = new LoggingQbClient(locking, sp.GetRequiredService<ILoggerFactory>().CreateLogger<LoggingQbClient>());
+    qb = new CachingQbClient(qb, config.CacheLifetime);
     return config.Redact || !config.AllowPayroll ? new RedactingQbClient(qb, sensitive: config.Redact, payroll: !config.AllowPayroll) : qb;
 });
 builder.Services.AddQuickBooksMcp(config).WithStdioServerTransport();
