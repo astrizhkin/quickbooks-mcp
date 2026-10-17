@@ -14,6 +14,9 @@ public sealed class QueryRunner(IQbClient qb)
     /// <summary>Largest page a caller can ask for, to protect the model's context.</summary>
     public const int MaxPageSize = 500;
 
+    /// <summary>Rough cap on the serialized size of one page; longer pages are cut and continue at next_cursor.</summary>
+    public const int MaxResponseChars = 100_000;
+
     /// <summary>
     /// Returns <c>{ count, records, next_cursor }</c>. The cursor is the number of records already
     /// returned: QuickBooks iterators do not survive our short per-call sessions, so the next page
@@ -30,12 +33,24 @@ public sealed class QueryRunner(IQbClient qb)
         // One extra record tells us whether another page exists.
         var response = await qb.SendAsync(entity.Request, filters.ToElements(entity, skip + size + 1), cancellationToken);
         var page = response.Records.Skip(skip).ToList();
+        var wanted = page.Take(size).Select(QbXmlJson.ToNode).ToList();
 
+        // Hard size cap: keep whole records until the page is big enough, but always at least one.
+        var kept = new JsonArray();
+        var chars = 0;
+        foreach (var record in wanted)
+        {
+            chars += record.ToJsonString().Length;
+            if (kept.Count > 0 && chars > MaxResponseChars) break;
+            kept.Add(record);
+        }
+
+        var more = page.Count > kept.Count;
         return new JsonObject
         {
-            ["count"] = Math.Min(page.Count, size),
-            ["records"] = new JsonArray(page.Take(size).Select(QbXmlJson.ToNode).ToArray()),
-            ["next_cursor"] = page.Count > size ? (skip + size).ToString(CultureInfo.InvariantCulture) : null,
+            ["count"] = kept.Count,
+            ["records"] = kept,
+            ["next_cursor"] = more ? (skip + kept.Count).ToString(CultureInfo.InvariantCulture) : null,
         };
     }
 }

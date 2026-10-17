@@ -25,7 +25,8 @@ builder.Logging.SetMinimumLevel(Enum.Parse<LogLevel>(config.LogLevel));
 // stdout carries the protocol, so all logs go to stderr.
 builder.Logging.AddConsole(o => o.LogToStandardErrorThreshold = LogLevel.Trace);
 builder.Services.AddSingleton(config);
-builder.Services.AddSingleton<IQbClient>(new LockingQbClient(new ComQbClient(config.Qb), config.Qb));
+IQbClient qb = new LockingQbClient(new ComQbClient(config.Qb), config.Qb);
+builder.Services.AddSingleton(config.Redact ? new RedactingQbClient(qb) : qb);
 builder.Services.AddQuickBooksMcp(config).WithStdioServerTransport();
 
 await builder.Build().RunAsync();

@@ -24,7 +24,7 @@ public sealed class ServerConfig
     /// <summary>Whether write tools are registered.</summary>
     public bool AllowWrites { get; init; }
 
-    /// <summary>Whether personal data is redacted from results.</summary>
+    /// <summary>Whether sensitive data (tax IDs, bank and card numbers, payroll) is redacted from results. On by default.</summary>
     public bool Redact { get; init; }
 
     /// <summary>Minimum log level name (Trace..Critical).</summary>
@@ -57,8 +57,8 @@ public sealed class ServerConfig
                 Timeout = TimeSpan.FromSeconds(ParseInt(values, "TIMEOUT_SECONDS", (int)defaults.Timeout.TotalSeconds, 1)),
                 MaxRetries = ParseInt(values, "MAX_RETRIES", defaults.MaxRetries, 0),
             },
-            AllowWrites = ParseBool(values, "ALLOW_WRITES"),
-            Redact = ParseBool(values, "REDACT"),
+            AllowWrites = ParseBool(values, "ALLOW_WRITES", fallback: false),
+            Redact = ParseBool(values, "REDACT", fallback: true),
             LogLevel = values.TryGetValue("LOG_LEVEL", out var level)
                 ? ParseEnum<LogLevelName>("LOG_LEVEL", level).ToString()
                 : "Information",
@@ -97,8 +97,8 @@ public sealed class ServerConfig
         }
     }
 
-    private static bool ParseBool(Dictionary<string, string> values, string key) =>
-        !values.TryGetValue(key, out var text) ? false
+    private static bool ParseBool(Dictionary<string, string> values, string key, bool fallback) =>
+        !values.TryGetValue(key, out var text) ? fallback
         : bool.TryParse(text, out var b) ? b
         : throw new ConfigException($"{key} must be true or false, not '{text}'.");
 
