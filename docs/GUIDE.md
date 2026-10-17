@@ -87,6 +87,7 @@ Everything is read-only until you opt in. In the same `env` (or as arguments):
 | `QB_ALLOW_WRITES=true` / `--allow-writes` | enable create, update, delete and void |
 | `QB_ENABLE_WRITE`, `QB_ENABLE_UPDATE`, `QB_ENABLE_DELETE` | enable one kind only |
 | `QB_WRITE_ALLOW=Invoice,Customer` | limit which record types can change |
+| `QB_CONFIRM_WRITES=true` | also ask you to approve every create and update (deletes and voids are always confirmed) |
 | `QB_ALLOW_PAYROLL=true` | allow payroll data and reports |
 | `QB_REDACT=false` | stop masking tax IDs and bank and card numbers (not recommended) |
 

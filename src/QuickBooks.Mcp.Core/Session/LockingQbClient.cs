@@ -27,6 +27,7 @@ public sealed class LockingQbClient(IQbClient inner, QbOptions options) : IQbCli
             using (var mutex = new Mutex(false, _mutexName))
             {
                 Acquire(mutex, token);
+                QbProgress.Report("Talking to QuickBooks...");
                 try
                 {
                     return SendWithRetries(buildRequest, token);
@@ -41,6 +42,8 @@ public sealed class LockingQbClient(IQbClient inner, QbOptions options) : IQbCli
 
     private static void Acquire(Mutex mutex, CancellationToken token)
     {
+        var waited = System.Diagnostics.Stopwatch.StartNew();
+        var nextReport = TimeSpan.FromSeconds(2);
         while (true)
         {
             token.ThrowIfCancellationRequested();
@@ -51,6 +54,12 @@ public sealed class LockingQbClient(IQbClient inner, QbOptions options) : IQbCli
             catch (AbandonedMutexException)
             {
                 return; // the previous owner died; the lock is ours now
+            }
+
+            if (waited.Elapsed >= nextReport)
+            {
+                QbProgress.Report($"Waiting for another request to finish with this company file ({waited.Elapsed.TotalSeconds:0}s)...");
+                nextReport += TimeSpan.FromSeconds(5);
             }
         }
     }
@@ -66,6 +75,7 @@ public sealed class LockingQbClient(IQbClient inner, QbOptions options) : IQbCli
             catch (COMException) when (attempt < options.MaxRetries)
             {
                 // QuickBooks answers with COM errors while busy or showing a dialog.
+                QbProgress.Report($"QuickBooks is busy; trying again ({attempt + 1} of {options.MaxRetries})...");
                 token.WaitHandle.WaitOne(TimeSpan.FromMilliseconds(250 * Math.Pow(2, attempt)));
                 token.ThrowIfCancellationRequested();
             }

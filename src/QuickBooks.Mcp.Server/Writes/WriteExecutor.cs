@@ -22,7 +22,14 @@ public sealed record WriteCall(
 /// The single path every write tool takes: gate check, optional dry run, a two-step confirmation
 /// for deletes and voids, the call itself, and the audit entry.
 /// </summary>
-public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, IdempotencyStore? idempotency = null, TimeProvider? time = null)
+public sealed class WriteExecutor(
+    IQbClient qb,
+    WriteGate gate,
+    AuditLog audit,
+    IdempotencyStore? idempotency = null,
+    TimeProvider? time = null,
+    IUserConfirmation? confirmation = null,
+    bool confirmAllWrites = false)
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromMinutes(5);
     private readonly ConcurrentDictionary<string, (string Hash, DateTimeOffset Expires)> _tokens = new();
@@ -46,24 +53,39 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, 
         if (dryRun)
             return new JsonObject { ["dry_run"] = true, ["request"] = preview }.ToJsonString();
 
-        if (call.Op == WriteOp.Delete)
+        // Deletes and voids always need a human yes; creates and updates only when the server is set to ask.
+        if (call.Op == WriteOp.Delete || confirmAllWrites)
         {
-            if (confirmationToken is null)
+            var answer = confirmation is null
+                ? Confirmation.Unavailable
+                : await confirmation.AskAsync(Summary(call, preview), cancellationToken);
+
+            if (answer == Confirmation.Declined)
             {
-                var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-                _tokens[token] = (hash, Now() + TokenLifetime);
-                audit.Append("previewed", call.Op, call.Entity, hash, []);
-                return new JsonObject
-                {
-                    ["confirmation_required"] = true,
-                    ["request"] = preview,
-                    ["confirmation_token"] = token,
-                    ["message"] = "Nothing was changed. Show this to the user and, if they agree, call again with confirmation_token.",
-                }.ToJsonString();
+                audit.Append("declined", call.Op, call.Entity, hash, []);
+                throw new McpException("The user declined this change. Nothing was changed.");
             }
 
-            if (!_tokens.TryRemove(confirmationToken, out var issued) || issued.Hash != hash || issued.Expires < Now())
-                throw new McpException("The confirmation token is invalid, expired or for a different request. Request a new preview.");
+            // No way to ask in the client: fall back to the preview-and-token flow.
+            if (answer == Confirmation.Unavailable)
+            {
+                if (confirmationToken is null)
+                {
+                    var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(16)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+                    _tokens[token] = (hash, Now() + TokenLifetime);
+                    audit.Append("previewed", call.Op, call.Entity, hash, []);
+                    return new JsonObject
+                    {
+                        ["confirmation_required"] = true,
+                        ["request"] = preview,
+                        ["confirmation_token"] = token,
+                        ["message"] = "Nothing was changed. Show this to the user and, if they agree, call again with confirmation_token.",
+                    }.ToJsonString();
+                }
+
+                if (!_tokens.TryRemove(confirmationToken, out var issued) || issued.Hash != hash || issued.Expires < Now())
+                    throw new McpException("The confirmation token is invalid, expired or for a different request. Request a new preview.");
+            }
         }
 
         if (idempotencyKey is not null && idempotency is not null && call.Op == WriteOp.Create
@@ -94,4 +116,7 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, 
             throw;
         }
     }
+
+    private static string Summary(WriteCall call, string preview) =>
+        $"{call.Op} {call.Entity} in QuickBooks?\n\nThis is the request that will be sent:\n{(preview.Length > 1500 ? preview[..1500] + " ..." : preview)}";
 }

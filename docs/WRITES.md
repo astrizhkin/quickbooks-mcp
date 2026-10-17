@@ -50,3 +50,9 @@ record, and reusing a key for a different request is refused. Dry runs never use
 `create_inventory_record` and `update_inventory_record` cover InventorySite, InventoryAdjustment, TransferInventory and BuildAssembly.
 Reads: `search_inventory_sites`, `search_inventory_transactions`, `get_item_sites` (quantities per item and site) and
 `get_assemblies_can_build`. Inventory sites and per-site quantities need QuickBooks Enterprise with advanced inventory.
+
+## Approval
+Deletes and voids always need a person's approval. If your AI app supports MCP *elicitation* (it shows the server's question to you), you are asked directly, with the request that would be sent, and the change is made when you approve. If it does not, the first call returns a preview and a confirmation token and the model must show you the preview and call again, which relies on the model doing that honestly. `QB_CONFIRM_WRITES=true` applies the same rule to creates and updates. A declined change is logged as `declined` in the audit log.
+
+## Slow calls and cancelling
+While QuickBooks is starting, busy, or another request holds the company file, the server reports progress to clients that ask for it ("Opening the QuickBooks connection...", "Waiting for another request to finish..."), which keeps many clients from timing out. Cancelling a call stops it waiting for the file lock and for retries; a request already inside QuickBooks cannot be interrupted and finishes on its own.

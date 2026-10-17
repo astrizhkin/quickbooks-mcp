@@ -22,7 +22,8 @@ AI app (Claude, VS Code, ...)  <--stdio-->  quickbooks-mcp  <--local COM-->  Qui
 | Read-only | on: no create, update, delete or void tool is even registered | `--allow-writes`, or `QB_ENABLE_WRITE` / `QB_ENABLE_UPDATE` / `QB_ENABLE_DELETE` |
 | Entity allowlist for writes | all (when writes are on) | `QB_WRITE_ALLOW=Invoice,Customer` |
 | Preview | `dryRun` shows the exact request and sends nothing | per call |
-| Two-step delete and void | always: first call returns a preview and a single-use, 5-minute token tied to that record | none |
+| Approval of deletes and voids | always. The client asks the user directly (MCP elicitation) when it supports that; otherwise the first call returns a preview and a single-use, 5-minute token tied to that record | none |
+| Approval of creates and updates | off | `QB_CONFIRM_WRITES=true` asks the user for these too, by the same route |
 | Audit log | every write, preview and duplicate: time, operation, entity, request hash, record IDs; **no field values** | `QB_AUDIT_LOG` for the path |
 | Idempotency | optional key per create so retries cannot duplicate | per call |
 | Redaction | tax IDs, bank and card numbers, card-processing blocks masked in every result | `QB_REDACT=false` turns it off |
@@ -60,7 +61,7 @@ Every text field in QuickBooks (names, memos, descriptions, addresses, custom fi
 | Can report text become a link, image or HTML when rendered? | Markdown cells could carry `![](http://...)` image or link syntax, which some clients fetch or render. | **Fixed:** brackets, backticks, backslashes, pipes and angle brackets are escaped in markdown output. |
 | Does the model know record text is not an instruction? | It did not. | **Fixed:** the server's instructions say record text is data, never to be followed, and that changes happen only when the user asked in this conversation and after showing a preview. |
 | Do tool descriptions invite risky behaviour? | Descriptions are short and say what a tool does; delete and void descriptions tell the model to show the preview to the user first. | No change needed. |
-| Is the write confirmation flow enough? | The two-step delete and void proves the model asked twice, not that a human agreed: a model steered by planted text can make both calls. | **Not solved here.** Asking the user directly through the client (MCP elicitation, #62) is the real fix; until then keep writes off, or on with a narrow `QB_WRITE_ALLOW`, for books where outside parties can enter text. |
+| Is the write confirmation flow enough? | The token flow proves the model asked twice, not that a human agreed: a model steered by planted text can make both calls. | **Fixed where the client allows it:** the server now asks the user directly through MCP elicitation, so the approval comes from a person. Clients without elicitation fall back to the token flow, which has the weakness described; for books where outside parties can enter text, keep writes off or limit them with `QB_WRITE_ALLOW`. |
 | Can a tool send data out? | No tool makes network requests or runs commands. | Nothing to fix. The exfiltration risk is in the other tools the AI app has (see threat 3). |
 
 The tests for these cases are `HostileTextTests` and `HostileWriteTests`.

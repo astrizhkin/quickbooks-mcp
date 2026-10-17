@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <ClassAddRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <ClassRet>
+      <ListID>80000001-1000000003</ListID>
+      <Name>Residential</Name>
+      <IsActive>true</IsActive>
+    </ClassRet>
+  </ClassAddRs>
+</QBXMLMsgsRs></QBXML>

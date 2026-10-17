@@ -47,6 +47,7 @@ public sealed class ComQbClient(QbOptions options) : IQbClient
         var connected = false;
         try
         {
+            QbProgress.Report("Opening the QuickBooks connection (this can take a while if QuickBooks has to start)...");
             rp.OpenConnection2("", options.AppName, LocalQbd);
             connected = true;
             ticket = (string)rp.BeginSession(options.CompanyFile ?? "", (int)options.Mode);

@@ -35,7 +35,7 @@ public sealed class CustomFieldWriteTools(WriteExecutor executor)
 
     /// <summary>Removes a custom field definition.</summary>
     [McpServerTool(Name = "delete_custom_field_definition", ReadOnly = false, Destructive = true)]
-    [Description("Delete a custom field definition and every value stored in it. The first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.")]
+    [Description("Delete a custom field definition and every value stored in it. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.")]
     public Task<string> DeleteDefinition(
         [Description("Field name.")] string name,
         [Description("The confirmation_token from the preview; omit on the first call.")] string? confirmationToken = null,
@@ -71,7 +71,7 @@ public sealed class CustomFieldWriteTools(WriteExecutor executor)
 
     /// <summary>Clears a custom field value.</summary>
     [McpServerTool(Name = "delete_custom_field_value", ReadOnly = false, Destructive = true)]
-    [Description("Remove the value of a custom field from a record. The first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.")]
+    [Description("Remove the value of a custom field from a record. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.")]
     public Task<string> DeleteValue(
         [Description("Kind of record, e.g. Customer, Vendor, Item, Invoice.")] string recordType,
         [Description("ListID (lists) or TxnID (transactions) of the record.")] string id,

@@ -156,7 +156,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Add a custom text field '
 
 ### `delete_custom_field_definition`
 
-Delete a custom field definition and every value stored in it. The first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.
+Delete a custom field definition and every value stored in it. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Remove the 'Region' custom field."*
 
@@ -169,7 +169,7 @@ Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Remove the 'Region' cust
 
 ### `delete_custom_field_value`
 
-Remove the value of a custom field from a record. The first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.
+Remove the value of a custom field from a record. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Clear the Region on Acme."*
 
@@ -202,7 +202,7 @@ Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Set Acme's Region to Wes
 
 ### `delete_record`
 
-Permanently delete a list item (customer, vendor, item...) or a transaction. The first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token. Prefer void_transaction for transactions that can be voided.
+Permanently delete a list item (customer, vendor, item...) or a transaction. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token. Prefer void_transaction for transactions that can be voided.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Delete the duplicate vendor 'Acme Supply (old)'."*
 
@@ -216,7 +216,7 @@ Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Delete the duplicate ven
 
 ### `void_transaction`
 
-Void a transaction: it stays in the books with a zero amount. The first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token.
+Void a transaction: it stays in the books with a zero amount. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Void invoice 1042."*
 

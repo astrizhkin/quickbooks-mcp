@@ -1,6 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using ModelContextProtocol.Server;
+using ModelContextProtocol;
+using ModelContextProtocol.Protocol;
+using QuickBooks.Mcp.Core.Session;
 using QuickBooks.Mcp.Server.Prompts;
 using QuickBooks.Mcp.Server.Resources;
 using QuickBooks.Mcp.Server.Tools;
@@ -29,7 +32,38 @@ public static class McpSetup
         {
             o.ServerInfo = new() { Name = "quickbooks-mcp", Version = Version };
             o.ServerInstructions = Instructions;
-        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
+        }).WithRequestFilters(filters => filters.AddCallToolFilter(next => async (context, cancellationToken) =>
+        {
+            using var scope = RequestScope.Enter(context.Server);
+
+            // When the client asked for progress, pass on what the QuickBooks layers say they are waiting for.
+            if (context.Params?.ProgressToken is not { } token) return await next(context, cancellationToken);
+            var step = 0;
+            var pending = new System.Collections.Concurrent.ConcurrentBag<Task>();
+            CallToolResult result;
+            using (QbProgress.Listen(message =>
+            {
+                var progress = new ProgressNotificationValue { Progress = Interlocked.Increment(ref step), Message = message };
+                pending.Add(Task.Run(async () =>
+                {
+                    try
+                    {
+                        await context.Server.NotifyProgressAsync(token, progress);
+                    }
+                    catch (Exception)
+                    {
+                        // progress is a courtesy; a failed notification must never fail the tool
+                    }
+                }));
+            }))
+            {
+                result = await next(context, cancellationToken);
+            }
+
+            // Progress belongs to the call, so every notification is sent before the result.
+            await Task.WhenAll(pending);
+            return result;
+        })).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
         if (config.AllowPayroll) builder.WithTools<PayrollTools>();
 
@@ -37,7 +71,10 @@ public static class McpSetup
         services.AddSingleton(gate);
         services.AddSingleton(new AuditLog(config.AuditLogPath));
         services.AddSingleton(new IdempotencyStore(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(config.AuditLogPath))!, "idempotency.jsonl")));
-        services.AddSingleton<WriteExecutor>();
+        services.AddSingleton<IUserConfirmation>(sp => new ElicitationConfirmation(() => RequestScope.Server));
+        services.AddSingleton(sp => new WriteExecutor(
+            sp.GetRequiredService<IQbClient>(), sp.GetRequiredService<WriteGate>(), sp.GetRequiredService<AuditLog>(),
+            sp.GetRequiredService<IdempotencyStore>(), null, sp.GetRequiredService<IUserConfirmation>(), config.ConfirmWrites));
 
         services.AddSingleton<RecordWriter>();
         if (gate.Allows(WriteOp.Create) || gate.Allows(WriteOp.Update) || gate.Allows(WriteOp.Delete)) builder.WithTools<WriteSchemaTools>();
