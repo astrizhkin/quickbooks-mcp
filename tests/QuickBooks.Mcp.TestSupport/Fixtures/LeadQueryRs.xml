@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <LeadQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <LeadRet>
+      <ListID>80000001-2000000001</ListID>
+      <Name>Example Lead</Name>
+      <IsActive>true</IsActive>
+    </LeadRet>
+  </LeadQueryRs>
+</QBXMLMsgsRs></QBXML>

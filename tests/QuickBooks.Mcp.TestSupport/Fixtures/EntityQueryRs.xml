@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <EntityQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <EntityRet>
+      <ListID>80000001-2000000001</ListID>
+      <Name>Example Entity</Name>
+      <IsActive>true</IsActive>
+    </EntityRet>
+  </EntityQueryRs>
+</QBXMLMsgsRs></QBXML>

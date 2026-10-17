@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <VendorQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <VendorRet>
+      <ListID>80000001-2000000001</ListID>
+      <Name>Example Vendor</Name>
+      <IsActive>true</IsActive>
+    </VendorRet>
+  </VendorQueryRs>
+</QBXMLMsgsRs></QBXML>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <OtherNameQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <OtherNameRet>
+      <ListID>80000001-2000000001</ListID>
+      <Name>Example OtherName</Name>
+      <IsActive>true</IsActive>
+    </OtherNameRet>
+  </OtherNameQueryRs>
+</QBXMLMsgsRs></QBXML>
