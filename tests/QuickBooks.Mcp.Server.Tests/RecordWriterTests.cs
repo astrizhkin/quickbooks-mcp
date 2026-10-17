@@ -155,3 +155,36 @@ public sealed class JournalEntryTests
         await Assert.ThrowsAsync<FileNotFoundException>(() => Writer().CreateAsync(["JournalEntry"], "JournalEntry", Entry("100.00"), false, default));
     }
 }
+
+public class CardDataTests
+{
+    [Theory]
+    [InlineData("ReceivePayment", "Add", """{ "CreditCardTxnInfo": { "CreditCardTxnInputInfo": { "CreditCardNumber": "4111111111111111" } } }""")]
+    [InlineData("SalesReceipt", "Add", """{ "CreditCardTxnInfo": {} }""")]
+    [InlineData("Customer", "Add", """{ "CreditCardInfo": { "CreditCardNumber": "4111111111111111" } }""")]
+    public void Card_data_is_refused_on_writes(string entity, string suffix, string json)
+    {
+        var ex = Assert.Throws<ArgumentException>(() => WriteSchema.Instance.Build(entity, suffix, (JsonObject)JsonNode.Parse(json)!));
+
+        Assert.Contains("card data is not accepted", ex.Message);
+    }
+
+    [Fact]
+    public void Card_fields_are_hidden_from_the_field_listing()
+    {
+        var tree = WriteSchema.Instance.Describe("ReceivePayment", "Add").ToJsonString();
+
+        Assert.DoesNotContain("CreditCardTxn", tree);
+        Assert.Contains("CustomerRef", tree);
+    }
+
+    [Fact]
+    public void Credit_card_charges_to_an_account_are_still_allowed()
+    {
+        var data = (JsonObject)JsonNode.Parse("""{ "AccountRef": { "FullName": "Visa" }, "TxnDate": "2025-01-01" }""")!;
+
+        var element = WriteSchema.Instance.Build("CreditCardCharge", "Add", data);
+
+        Assert.NotNull(element.Element("TxnDate"));
+    }
+}

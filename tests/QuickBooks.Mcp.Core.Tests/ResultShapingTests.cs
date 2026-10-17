@@ -42,3 +42,26 @@ public class ResultShapingTests
         Assert.Equal("1", (string?)result["next_cursor"]);
     }
 }
+
+public class CardRedactionTests
+{
+    private sealed class CannedClient(string reply) : IQbClient
+    {
+        public Task<string> SendAsync(Func<string, string> buildRequest, CancellationToken cancellationToken = default) => Task.FromResult(reply);
+    }
+
+    [Fact]
+    public async Task Card_processing_blocks_are_masked()
+    {
+        var qb = new RedactingQbClient(new CannedClient("""
+            <QBXML><QBXMLMsgsRs><ReceivePaymentQueryRs statusCode="0"><ReceivePaymentRet><TxnID>1</TxnID>
+              <CreditCardTxnInfo><CreditCardTxnResultInfo><AuthorizationCode>ABC123</AuthorizationCode></CreditCardTxnResultInfo></CreditCardTxnInfo>
+            </ReceivePaymentRet></ReceivePaymentQueryRs></QBXMLMsgsRs></QBXML>
+            """));
+
+        var reply = await qb.SendAsync(v => v);
+
+        Assert.DoesNotContain("ABC123", reply);
+        Assert.Contains("<TxnID>1</TxnID>", reply);
+    }
+}

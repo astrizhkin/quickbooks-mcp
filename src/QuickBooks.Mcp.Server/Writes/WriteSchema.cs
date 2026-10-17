@@ -17,6 +17,12 @@ public sealed class WriteSchema
     private readonly Dictionary<string, string> _entities = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Field[]> _types = [];
 
+    /// <summary>
+    /// Card data is never accepted: no card numbers and no processing info (PCI scope, see docs/design/credit-card-processing.md).
+    /// </summary>
+    private static bool IsCardData(string name) =>
+        name.StartsWith("CreditCardTxn", StringComparison.Ordinal) || name is "CreditCardInfo" or "CreditCardNumber";
+
     /// <summary>The embedded schema.</summary>
     public static WriteSchema Instance { get; } = Load();
 
@@ -56,7 +62,7 @@ public sealed class WriteSchema
     private JsonObject Describe(string typeId, int depth)
     {
         var obj = new JsonObject();
-        foreach (var f in _types[typeId])
+        foreach (var f in _types[typeId].Where(f => !IsCardData(f.Name)))
         {
             JsonNode node = f.Type == "" ? "" : depth >= 3 ? "{...}" : Describe(f.Type, depth + 1);
             obj[f.Name] = f.Many ? new JsonArray(node) : node;
@@ -67,7 +73,10 @@ public sealed class WriteSchema
 
     private IEnumerable<XElement> Content(string typeId, JsonObject data, string path)
     {
-        var fields = _types[typeId];
+        var fields = _types[typeId].Where(f => !IsCardData(f.Name)).ToArray();
+        foreach (var key in data.Select(p => p.Key).Where(IsCardData))
+            throw new ArgumentException($"{key}: card data is not accepted by this server. Record card payments as ordinary payments without card details.");
+
         foreach (var key in data.Select(p => p.Key))
             if (!fields.Any(f => f.Name.Equals(key, StringComparison.OrdinalIgnoreCase)))
                 throw new ArgumentException($"'{key}' is not a field of {path}. Valid fields: {string.Join(", ", fields.Select(f => f.Name))}.");

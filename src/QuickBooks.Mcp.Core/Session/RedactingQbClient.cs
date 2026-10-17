@@ -17,7 +17,7 @@ public sealed class RedactingQbClient(IQbClient inner, bool sensitive = true, bo
     {
         "SSN", "SocialSecurityNumber", "VendorTaxIdent", "TaxIdent", "TaxRegistrationNumber",
         "BankNumber", "AccountNumber", "RoutingNumber", "CreditCardNumber", "CreditCardNumberLast4",
-        "CardNumber", "DriversLicenseNumber",
+        "CardNumber", "DriversLicenseNumber", "CreditCardInfo", "CreditCardTxnInfo", "CreditCardTxnInputInfo", "CreditCardTxnResultInfo",
     };
 
     private static readonly HashSet<string> Payroll = new(StringComparer.Ordinal) { "PayrollInfo", "EmployeePayrollInfo" };
