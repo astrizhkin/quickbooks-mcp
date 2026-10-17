@@ -129,3 +129,7 @@ QuickBooks and the server must run at the same Windows privilege level. `--docto
 - **Logs** go to stderr (your AI app usually shows them in its MCP log view). Set `QB_LOG_LEVEL` (`Trace` ... `Critical`) and optionally `QB_LOG_FILE` to also write to a file. Logs say which request ran, how long it took and whether it worked, with QuickBooks error codes. They never contain the request or reply, so no company data, names or amounts. Detailed error text appears only at `Debug` level.
 - **Bug reports:** run `--diagnostics` and paste the output. It has versions, your settings (the company file by name only), and the `--doctor` checks. It contains no company data.
 - **No telemetry.** Nothing is sent anywhere unless a future version asks you to opt in first.
+
+## 9. Multi-currency and older company files
+
+In a multi-currency company, each transaction carries its own currency (`CurrencyRef`) and exchange rate. Any search result that contains a foreign-currency record gets a `currency` block naming the home currency and how to read amounts: amounts on a record are in that record's currency, fields ending in `InHomeCurrency` are in the home currency, and reports are always in the home currency. Single-currency companies get no such block (and no extra request). Company files created in older QuickBooks years work as long as the installed QuickBooks can open them; features newer than that QuickBooks are refused with a message (see [COMPATIBILITY.md](COMPATIBILITY.md)).

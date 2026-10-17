@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.Json.Nodes;
 using QuickBooks.Mcp.Core.QbXml;
 using QuickBooks.Mcp.Core.Session;
@@ -45,12 +46,29 @@ public sealed class QueryRunner(IQbClient qb)
             kept.Add(record);
         }
 
-        var more = page.Count > kept.Count;
-        return new JsonObject
+        var result = new JsonObject
         {
             ["count"] = kept.Count,
             ["records"] = kept,
-            ["next_cursor"] = more ? (skip + kept.Count).ToString(CultureInfo.InvariantCulture) : null,
+            ["next_cursor"] = page.Count > kept.Count ? (skip + kept.Count).ToString(CultureInfo.InvariantCulture) : null,
         };
+
+        // A CurrencyRef only appears on foreign-currency records, so this costs nothing for single-currency companies.
+        if (page.Take(kept.Count).Any(r => r.Descendants("CurrencyRef").Any()))
+        {
+            string? home = null;
+            try
+            {
+                home = await CurrencyContext.For(qb).HomeCurrencyAsync(cancellationToken);
+            }
+            catch (Exception ex) when (ex is COMException or QbException or InvalidOperationException)
+            {
+                // the amounts are still correct; only the home currency name is missing from the note
+            }
+
+            result["currency"] = new JsonObject { ["home"] = home, ["note"] = CurrencyContext.Note(home) };
+        }
+
+        return result;
     }
 }
