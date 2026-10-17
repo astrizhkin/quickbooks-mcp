@@ -25,7 +25,7 @@ public sealed class SalesWriteTools(RecordWriter writer)
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_sales_transaction", ReadOnly = false, Destructive = true)]
-    [Description("Update a sales transaction (invoice, sales receipt, credit memo, estimate, sales order, payment received, refund, charge, deposit). Only the fields you give are changed. The current EditSequence is fetched for you.")]
+    [Description("Update a sales transaction (invoice, sales receipt, credit memo, estimate, sales order, payment received, refund, charge, deposit); only the fields you give change, and the EditSequence is fetched for you.")]
     public Task<string> Update(
         [Description("One of: Invoice,SalesReceipt,CreditMemo,Estimate,SalesOrder,ReceivePayment,ARRefundCreditCard,Charge,Deposit.")] string entity,
         [Description("ListID or TxnID of the record to change (find it with a search tool).")] string id,

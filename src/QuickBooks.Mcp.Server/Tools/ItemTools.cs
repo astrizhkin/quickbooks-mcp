@@ -17,7 +17,7 @@ public sealed class ItemTools(IQbClient qb)
 
     /// <summary>Searches items, optionally of one type.</summary>
     [McpServerTool(Name = "search_items", ReadOnly = true)]
-    [Description("Search items by name. Inventory items include quantities on hand and assemblies include how many can be built. Optionally limit to one item type.")]
+    [Description("Search items by name, optionally of one type; inventory items include quantities on hand.")]
     public Task<string> SearchItems(
         [Description("Limit to one type: Service, NonInventory, Inventory, InventoryAssembly, OtherCharge, Discount, SalesTax, SalesTaxGroup, Group, Subtotal, Payment or FixedAsset. Omit for all types.")] string? itemType = null,
         [Description("Name contains this text.")] string? nameContains = null,

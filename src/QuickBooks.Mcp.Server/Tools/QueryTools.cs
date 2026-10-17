@@ -12,7 +12,7 @@ public sealed class QueryTools(IQbClient qb, ServerConfig? config = null)
 {
     /// <summary>Queries any supported entity.</summary>
     [McpServerTool(Name = "query_records", ReadOnly = true)]
-    [Description("Search any QuickBooks entity (e.g. Customer, Vendor, Item, Invoice, Bill) with filters. Returns records plus next_cursor for the next page.")]
+    [Description("Search any QuickBooks entity (Customer, Invoice, Bill...) with filters; returns records and a next_cursor.")]
     public Task<string> QueryRecords(
         [Description("Entity name, e.g. Customer, Vendor, Employee, Account, Item, Class, Invoice, Bill, Check, Estimate, SalesOrder, PurchaseOrder, JournalEntry.")] string entity,
         [Description("ListID values (lists) or TxnID values (transactions).")] string[]? ids = null,

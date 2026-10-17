@@ -14,7 +14,7 @@ public sealed class DeleteTools(WriteExecutor executor)
 
     /// <summary>Deletes a list item or a transaction.</summary>
     [McpServerTool(Name = "delete_record", ReadOnly = false, Destructive = true)]
-    [Description("Permanently delete a list item (customer, vendor, item...) or a transaction. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token. Prefer void_transaction for transactions that can be voided.")]
+    [Description("Permanently delete a list item or a transaction (prefer void_transaction). The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.")]
     public Task<string> Delete(
         [Description("Entity type, e.g. Customer, Vendor, ItemService, Invoice, Bill, Check.")] string entity,
         [Description("ListID or TxnID of the record.")] string id,
@@ -31,7 +31,7 @@ public sealed class DeleteTools(WriteExecutor executor)
 
     /// <summary>Voids a transaction.</summary>
     [McpServerTool(Name = "void_transaction", ReadOnly = false, Destructive = true)]
-    [Description("Void a transaction: it stays in the books with a zero amount. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token.")]
+    [Description("Void a transaction; it stays in the books at zero. The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.")]
     public Task<string> Void(
         [Description("Transaction type, e.g. Invoice, Bill, Check, CreditMemo, SalesReceipt, JournalEntry.")] string entity,
         [Description("TxnID of the transaction.")] string id,

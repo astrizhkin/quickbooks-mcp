@@ -16,7 +16,7 @@ public sealed class BatchWriteTools(RecordWriter writer)
 
     /// <summary>Creates several records, reporting each outcome.</summary>
     [McpServerTool(Name = "create_records", ReadOnly = false, Destructive = false)]
-    [Description("Create up to 50 records in one call. Each item is {entity, data, idempotencyKey?}. Items run in order; by default a failed item does not stop the rest, and every item gets its own result. Give each item an idempotencyKey so a retry of the whole call cannot duplicate.")]
+    [Description("Create up to 50 records in one call, each {entity, data, idempotencyKey?}; failed items are reported and the rest continue unless stopOnError. Give each an idempotencyKey so a retry cannot duplicate.")]
     public async Task<string> CreateRecords(
         [Description("Array of {\"entity\": \"Invoice\", \"data\": {...}, \"idempotencyKey\": \"...\"}.")] JsonElement items,
         [Description("true to preview every item and send nothing.")] bool dryRun = false,

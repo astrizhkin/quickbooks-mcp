@@ -25,7 +25,7 @@ public sealed class PurchaseWriteTools(RecordWriter writer)
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_purchase_transaction", ReadOnly = false, Destructive = true)]
-    [Description("Update a purchase or banking transaction (bill, bill payment, purchase order, item receipt, vendor credit, check, credit card charge or credit, sales tax payment, transfer, journal entry). Only the fields you give are changed. The current EditSequence is fetched for you.")]
+    [Description("Update a purchase or banking transaction (bill, bill payment, purchase order, item receipt, vendor credit, check, credit card charge or credit, sales tax payment, transfer, journal entry); only the fields you give change, and the EditSequence is fetched for you.")]
     public Task<string> Update(
         [Description("One of: Bill,BillPaymentCheck,BillPaymentCreditCard,PurchaseOrder,ItemReceipt,VendorCredit,Check,CreditCardCharge,CreditCardCredit,SalesTaxPaymentCheck,Transfer,JournalEntry.")] string entity,
         [Description("ListID or TxnID of the record to change (find it with a search tool).")] string id,

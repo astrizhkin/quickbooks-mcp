@@ -16,7 +16,7 @@ public sealed class ListWriteTools(RecordWriter writer)
     [McpServerTool(Name = "create_list_item", ReadOnly = false, Destructive = false)]
     [Description("Create a list record (customer, vendor, employee, item, account, class, terms and other setup lists). Use describe_write_fields to see the field names; set dryRun to preview the request without sending it.")]
     public Task<string> Create(
-        [Description("One of: Account,Class,Customer,Vendor,Employee,OtherName,Lead,ItemService,ItemNonInventory,ItemInventory,ItemInventoryAssembly,ItemOtherCharge,ItemDiscount,ItemSalesTax,ItemSalesTaxGroup,ItemGroup,ItemSubtotal,ItemPayment,ItemFixedAsset,StandardTerms,DateDrivenTerms,PaymentMethod,SalesTaxCode,SalesRep,Vehicle,BillingRate,PriceLevel,WorkersCompCode,CustomerType,VendorType,JobType,ShipMethod,CustomerMsg.")] string entity,
+        [Description("Kind of record, e.g. Customer, Vendor, Employee, Account, Class, ItemService, ItemInventory, StandardTerms, PaymentMethod. A wrong name returns the full list.")] string entity,
         [Description("Fields by qbXML element name, e.g. {\"Name\":\"Acme\",\"BillAddress\":{\"Addr1\":\"1 Main St\"}}. References are {\"FullName\":\"...\"} or {\"ListID\":\"...\"}; repeated elements (lines) are arrays.")] JsonElement data,
         [Description("true to show the request and send nothing.")] bool dryRun = false,
         [Description("Optional unique key, e.g. a UUID. Sending the same key and request again creates nothing new and returns the first result, so a retry cannot duplicate.")] string? idempotencyKey = null,
@@ -25,9 +25,9 @@ public sealed class ListWriteTools(RecordWriter writer)
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_list_item", ReadOnly = false, Destructive = true)]
-    [Description("Update a list record (customer, vendor, employee, item, account, class, terms and other setup lists). Only the fields you give are changed. The current EditSequence is fetched for you.")]
+    [Description("Update a list record (customer, vendor, employee, item, account, class, terms and other setup lists); only the fields you give change, and the EditSequence is fetched for you.")]
     public Task<string> Update(
-        [Description("One of: Account,Class,Customer,Vendor,Employee,OtherName,Lead,ItemService,ItemNonInventory,ItemInventory,ItemInventoryAssembly,ItemOtherCharge,ItemDiscount,ItemSalesTax,ItemSalesTaxGroup,ItemGroup,ItemSubtotal,ItemPayment,ItemFixedAsset,StandardTerms,DateDrivenTerms,PaymentMethod,SalesTaxCode,SalesRep,Vehicle,BillingRate,PriceLevel,WorkersCompCode,CustomerType,VendorType,JobType,ShipMethod,CustomerMsg.")] string entity,
+        [Description("Kind of record, e.g. Customer, Vendor, Employee, Account, Class, ItemService, ItemInventory, StandardTerms, PaymentMethod. A wrong name returns the full list.")] string entity,
         [Description("ListID or TxnID of the record to change (find it with a search tool).")] string id,
         [Description("The fields to change, by qbXML element name.")] JsonElement data,
         [Description("true to show the request and send nothing.")] bool dryRun = false,

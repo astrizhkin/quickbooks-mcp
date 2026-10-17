@@ -44,7 +44,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Log 2.5 hours for Pat on 
 
 ### `update_activity`
 
-Update a time entry, a vehicle mileage record or a to-do. Only the fields you give are changed. The current EditSequence is fetched for you.
+Update a time entry, a vehicle mileage record or a to-do; only the fields you give change, and the EditSequence is fetched for you.
 
 Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Mark the to-do 'Call Acme' as done."*
 
@@ -61,7 +61,7 @@ Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Mark the to-do 'Call Acm
 
 ### `create_records`
 
-Create up to 50 records in one call. Each item is {entity, data, idempotencyKey?}. Items run in order; by default a failed item does not stop the rest, and every item gets its own result. Give each item an idempotencyKey so a retry of the whole call cannot duplicate.
+Create up to 50 records in one call, each {entity, data, idempotencyKey?}; failed items are reported and the rest continue unless stopOnError. Give each an idempotencyKey so a retry cannot duplicate.
 
 Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Create these five customers from my list, and don't create duplicates if I ask again."*
 
@@ -156,7 +156,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Add a custom text field '
 
 ### `delete_custom_field_definition`
 
-Delete a custom field definition and every value stored in it. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.
+Delete a custom field definition and every value in it. The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Remove the 'Region' custom field."*
 
@@ -169,7 +169,7 @@ Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Remove the 'Region' cust
 
 ### `delete_custom_field_value`
 
-Remove the value of a custom field from a record. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; call again with the token to confirm.
+Remove a custom field's value from a record. The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Clear the Region on Acme."*
 
@@ -202,7 +202,7 @@ Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Set Acme's Region to Wes
 
 ### `delete_record`
 
-Permanently delete a list item (customer, vendor, item...) or a transaction. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token. Prefer void_transaction for transactions that can be voided.
+Permanently delete a list item or a transaction (prefer void_transaction). The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Delete the duplicate vendor 'Acme Supply (old)'."*
 
@@ -216,7 +216,7 @@ Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Delete the duplicate ven
 
 ### `void_transaction`
 
-Void a transaction: it stays in the books with a zero amount. If the client can ask the user, they are asked and the change is made once they approve. Otherwise the first call changes nothing and returns a preview and a confirmation_token; show it to the user, and only if they agree call again with the token.
+Void a transaction; it stays in the books at zero. The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.
 
 Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Void invoice 1042."*
 
@@ -232,7 +232,7 @@ Needs: `--allow-writes or QB_ENABLE_DELETE`. Example: *"Void invoice 1042."*
 
 ### `open_in_quickbooks`
 
-Open a record in the QuickBooks window so the user can look at it. Changes nothing. QuickBooks must be open on this computer.
+Open a record in the QuickBooks window for the user to look at; changes nothing, and QuickBooks must be open.
 
 Needs: nothing (always available). Example: *"Show me invoice 1042 in QuickBooks."*
 
@@ -326,7 +326,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Adjust Widget stock to 40
 
 ### `update_inventory_record`
 
-Update an inventory record (inventory site, inventory adjustment, inventory transfer, assembly build). Only the fields you give are changed. The current EditSequence is fetched for you.
+Update an inventory record (inventory site, inventory adjustment, inventory transfer, assembly build); only the fields you give change, and the EditSequence is fetched for you.
 
 Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Change the memo on that inventory adjustment."*
 
@@ -343,7 +343,7 @@ Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Change the memo on that 
 
 ### `search_items`
 
-Search items by name. Inventory items include quantities on hand and assemblies include how many can be built. Optionally limit to one item type.
+Search items by name, optionally of one type; inventory items include quantities on hand.
 
 Needs: nothing (always available). Example: *"Find service items with 'install' in the name."*
 
@@ -372,7 +372,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Add a customer called Acm
 
 | Parameter | Type | Description |
 |---|---|---|
-| `entity` * | string | One of: Account,Class,Customer,Vendor,Employee,OtherName,Lead,ItemService,ItemNonInventory,ItemInventory,ItemInventoryAssembly,ItemOtherCharge,ItemDiscount,ItemSalesTax,ItemSalesTaxGroup,ItemGroup,ItemSubtotal,ItemPayment,ItemFixedAsset,StandardTerms,DateDrivenTerms,PaymentMethod,SalesTaxCode,SalesRep,Vehicle,BillingRate,PriceLevel,WorkersCompCode,CustomerType,VendorType,JobType,ShipMethod,CustomerMsg. |
+| `entity` * | string | Kind of record, e.g. Customer, Vendor, Employee, Account, Class, ItemService, ItemInventory, StandardTerms, PaymentMethod. A wrong name returns the full list. |
 | `data` * | any | Fields by qbXML element name, e.g. {"Name":"Acme","BillAddress":{"Addr1":"1 Main St"}}. References are {"FullName":"..."} or {"ListID":"..."}; repeated elements (lines) are arrays. |
 | `dryRun` | boolean | true to show the request and send nothing. |
 | `idempotencyKey` | string | Optional unique key, e.g. a UUID. Sending the same key and request again creates nothing new and returns the first result, so a retry cannot duplicate. |
@@ -381,13 +381,13 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Add a customer called Acm
 
 ### `update_list_item`
 
-Update a list record (customer, vendor, employee, item, account, class, terms and other setup lists). Only the fields you give are changed. The current EditSequence is fetched for you.
+Update a list record (customer, vendor, employee, item, account, class, terms and other setup lists); only the fields you give change, and the EditSequence is fetched for you.
 
 Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Change Acme's phone number to 555-0199."*
 
 | Parameter | Type | Description |
 |---|---|---|
-| `entity` * | string | One of: Account,Class,Customer,Vendor,Employee,OtherName,Lead,ItemService,ItemNonInventory,ItemInventory,ItemInventoryAssembly,ItemOtherCharge,ItemDiscount,ItemSalesTax,ItemSalesTaxGroup,ItemGroup,ItemSubtotal,ItemPayment,ItemFixedAsset,StandardTerms,DateDrivenTerms,PaymentMethod,SalesTaxCode,SalesRep,Vehicle,BillingRate,PriceLevel,WorkersCompCode,CustomerType,VendorType,JobType,ShipMethod,CustomerMsg. |
+| `entity` * | string | Kind of record, e.g. Customer, Vendor, Employee, Account, Class, ItemService, ItemInventory, StandardTerms, PaymentMethod. A wrong name returns the full list. |
 | `id` * | string | ListID or TxnID of the record to change (find it with a search tool). |
 | `data` * | any | The fields to change, by qbXML element name. |
 | `dryRun` | boolean | true to show the request and send nothing. |
@@ -586,7 +586,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Enter a bill from Acme Su
 
 ### `update_purchase_transaction`
 
-Update a purchase or banking transaction (bill, bill payment, purchase order, item receipt, vendor credit, check, credit card charge or credit, sales tax payment, transfer, journal entry). Only the fields you give are changed. The current EditSequence is fetched for you.
+Update a purchase or banking transaction (bill, bill payment, purchase order, item receipt, vendor credit, check, credit card charge or credit, sales tax payment, transfer, journal entry); only the fields you give change, and the EditSequence is fetched for you.
 
 Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Change the due date on bill 7781."*
 
@@ -603,7 +603,7 @@ Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Change the due date on b
 
 ### `query_records`
 
-Search any QuickBooks entity (e.g. Customer, Vendor, Item, Invoice, Bill) with filters. Returns records plus next_cursor for the next page.
+Search any QuickBooks entity (Customer, Invoice, Bill...) with filters; returns records and a next_cursor.
 
 Needs: nothing (always available). Example: *"List the first 20 classes, only their names."*
 
@@ -799,7 +799,7 @@ Needs: `--allow-writes or QB_ENABLE_WRITE`. Example: *"Create an invoice for Acm
 
 ### `update_sales_transaction`
 
-Update a sales transaction (invoice, sales receipt, credit memo, estimate, sales order, payment received, refund, charge, deposit). Only the fields you give are changed. The current EditSequence is fetched for you.
+Update a sales transaction (invoice, sales receipt, credit memo, estimate, sales order, payment received, refund, charge, deposit); only the fields you give change, and the EditSequence is fetched for you.
 
 Needs: `--allow-writes or QB_ENABLE_UPDATE`. Example: *"Add a memo 'Thanks!' to invoice 1042."*
 

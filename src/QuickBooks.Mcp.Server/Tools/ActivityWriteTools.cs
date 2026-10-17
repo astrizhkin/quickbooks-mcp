@@ -25,7 +25,7 @@ public sealed class ActivityWriteTools(RecordWriter writer)
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_activity", ReadOnly = false, Destructive = true)]
-    [Description("Update a time entry, a vehicle mileage record or a to-do. Only the fields you give are changed. The current EditSequence is fetched for you.")]
+    [Description("Update a time entry, a vehicle mileage record or a to-do; only the fields you give change, and the EditSequence is fetched for you.")]
     public Task<string> Update(
         [Description("One of: TimeTracking,VehicleMileage,ToDo.")] string entity,
         [Description("ListID or TxnID of the record to change (find it with a search tool).")] string id,

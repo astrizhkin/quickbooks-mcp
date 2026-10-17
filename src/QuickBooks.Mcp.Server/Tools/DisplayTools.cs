@@ -18,7 +18,7 @@ public sealed class DisplayTools(IQbClient qb)
 
     /// <summary>Opens a customer, vendor, employee, item, account or transaction in QuickBooks.</summary>
     [McpServerTool(Name = "open_in_quickbooks", ReadOnly = true)]
-    [Description("Open a record in the QuickBooks window so the user can look at it. Changes nothing. QuickBooks must be open on this computer.")]
+    [Description("Open a record in the QuickBooks window for the user to look at; changes nothing, and QuickBooks must be open.")]
     public Task<string> OpenInQuickBooks(
         [Description("Kind of record: Customer, Vendor, Employee, Account, Item (any item type), OtherName, or a transaction such as Invoice, Bill, Check, Estimate, SalesOrder, PurchaseOrder, JournalEntry.")] string recordType,
         [Description("ListID (lists) or TxnID (transactions), from a search tool.")] string id,

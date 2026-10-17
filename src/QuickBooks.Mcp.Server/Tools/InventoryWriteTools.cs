@@ -25,7 +25,7 @@ public sealed class InventoryWriteTools(RecordWriter writer)
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_inventory_record", ReadOnly = false, Destructive = true)]
-    [Description("Update an inventory record (inventory site, inventory adjustment, inventory transfer, assembly build). Only the fields you give are changed. The current EditSequence is fetched for you.")]
+    [Description("Update an inventory record (inventory site, inventory adjustment, inventory transfer, assembly build); only the fields you give change, and the EditSequence is fetched for you.")]
     public Task<string> Update(
         [Description("One of: InventorySite,InventoryAdjustment,TransferInventory,BuildAssembly.")] string entity,
         [Description("ListID or TxnID of the record to change (find it with a search tool).")] string id,
