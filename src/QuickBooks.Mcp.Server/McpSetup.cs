@@ -33,7 +33,7 @@ public static class McpSetup
 
         services.AddSingleton<RecordWriter>();
         if (gate.Allows(WriteOp.Create) || gate.Allows(WriteOp.Update) || gate.Allows(WriteOp.Delete)) builder.WithTools<WriteSchemaTools>();
-        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools));
+        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(DeleteTools));
         return builder;
     }
 

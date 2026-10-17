@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <TxnVoidRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <TxnVoidedRet><TxnType>Invoice</TxnType><TxnID>1A-1000000001</TxnID></TxnVoidedRet>
+  </TxnVoidRs>
+</QBXMLMsgsRs></QBXML>

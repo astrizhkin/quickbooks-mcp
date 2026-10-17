@@ -26,3 +26,14 @@ transaction, send an `...LineMod` with `TxnLineID` set to `-1`. To link a new in
 `LinkToTxnID` or the line's `LinkToTxn`.
 
 `dryRun: true` shows the exact request and sends nothing. Journal entries are checked for balance before anything is sent.
+
+## Deleting and voiding
+`delete_record` and `void_transaction` need `QB_ENABLE_DELETE` (or `--allow-writes`). The first call never changes anything: it returns the
+request and a single-use `confirmation_token` valid for five minutes and tied to that exact record. Call again with the token to perform it.
+Voiding keeps the transaction in the books at zero; deleting removes it. Prefer voiding.
+
+- **Can be voided:** ARRefundCreditCard, Bill, BillPaymentCheck, BillPaymentCreditCard, Charge, Check, CreditCardCharge, CreditCardCredit, CreditMemo, Deposit, InventoryAdjustment, Invoice, ItemReceipt, JournalEntry, SalesReceipt, VendorCredit
+- **Transactions that can be deleted:** ARRefundCreditCard, Bill, BillPaymentCheck, BillPaymentCreditCard, BuildAssembly, Charge, Check, CreditCardCharge, CreditCardCredit, CreditMemo, Deposit, Estimate, InventoryAdjustment, Invoice, ItemReceipt, JournalEntry, PayrollLiabilityAdjustment, PayrollPriorPayment, PayrollYearToDateAdjustment, PurchaseOrder, ReceivePayment, SalesOrder, SalesReceipt, SalesTaxPaymentCheck, TimeTracking, TransferInventory, VehicleMileage, VendorCredit
+- **List items that can be deleted:** Account, BillingRate, Class, Currency, Customer, CustomerMsg, CustomerType, DateDrivenTerms, Employee, InventorySite, ItemDiscount, ItemFixedAsset, ItemGroup, ItemInventory, ItemInventoryAssembly, ItemNonInventory, ItemOtherCharge, ItemPayment, ItemSalesTax, ItemSalesTaxGroup, ItemService, ItemSubtotal, JobType, OtherName, PaymentMethod, PayrollItemNonWage, PayrollItemWage, PriceLevel, SalesRep, SalesTaxCode, ShipMethod, StandardTerms, ToDo, UnitOfMeasureSet, Vehicle, Vendor, VendorType, WorkersCompCode
+
+Estimates, sales orders and purchase orders can be deleted but not voided.
