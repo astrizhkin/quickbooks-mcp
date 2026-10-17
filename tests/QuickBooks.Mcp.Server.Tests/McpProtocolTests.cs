@@ -41,3 +41,9 @@ public class McpProtocolTests
         try { await serverTask; } catch (OperationCanceledException) { }
     }
 }
+
+public class VersionTests
+{
+    [Fact]
+    public void Server_version_comes_from_the_build() => Assert.Matches(@"^\d+\.\d+\.\d+", McpSetup.Version);
+}

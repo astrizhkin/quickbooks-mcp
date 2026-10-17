@@ -17,12 +17,15 @@ public static class McpSetup
         Amounts are in the company's home currency unless a tool says otherwise.
         """;
 
+    /// <summary>The server version, from the build (the git tag on a release).</summary>
+    public static string Version { get; } = typeof(McpSetup).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion.Split('+')[0] ?? "0.0.0";
+
     /// <summary>Adds the MCP server with all tools allowed by the configuration.</summary>
     public static IMcpServerBuilder AddQuickBooksMcp(this IServiceCollection services, ServerConfig config)
     {
         var builder = services.AddMcpServer(o =>
         {
-            o.ServerInfo = new() { Name = "quickbooks-mcp", Version = "0.1.0" };
+            o.ServerInfo = new() { Name = "quickbooks-mcp", Version = Version };
             o.ServerInstructions = Instructions;
         }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 

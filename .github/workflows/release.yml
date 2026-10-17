@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        rid: [win-x64, win-x86]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Test
+        run: dotnet test -c Release
+      - name: Publish single file
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          dotnet publish src/QuickBooks.Mcp.Server -c Release -r ${{ matrix.rid }} -p:Version="$version" -o out
+          cp out/quickbooks-mcp.exe "quickbooks-mcp-${{ matrix.rid }}.exe"
+          sha256sum "quickbooks-mcp-${{ matrix.rid }}.exe" > "quickbooks-mcp-${{ matrix.rid }}.exe.sha256"
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: quickbooks-mcp-${{ matrix.rid }}.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.rid }}
+          path: quickbooks-mcp-${{ matrix.rid }}.exe*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd dist
+          cat *.sha256 > SHA256SUMS.txt
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes quickbooks-mcp-*.exe SHA256SUMS.txt

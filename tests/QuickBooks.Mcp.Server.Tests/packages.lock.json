@@ -376,16 +376,16 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
-      "quickbooks.mcp.core": {
-        "type": "Project"
-      },
-      "quickbooks.mcp.server": {
+      "quickbooks-mcp": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Hosting": "[10.0.13, )",
           "ModelContextProtocol": "[2.2.0, )",
           "QuickBooks.Mcp.Core": "[1.0.0, )"
         }
+      },
+      "quickbooks.mcp.core": {
+        "type": "Project"
       },
       "quickbooks.mcp.testsupport": {
         "type": "Project",
