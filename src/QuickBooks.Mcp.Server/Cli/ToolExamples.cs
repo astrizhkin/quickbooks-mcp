@@ -55,6 +55,7 @@ public static class ToolExamples
         ["search_accounts"] = "Show bank accounts and their balances.",
         ["search_setup_lists"] = "List the payment terms.",
         ["describe_write_fields"] = "What fields can I set when creating an invoice?",
+        ["open_in_quickbooks"] = "Show me invoice 1042 in QuickBooks.",
     };
 
     /// <summary>The example prompt for a tool.</summary>

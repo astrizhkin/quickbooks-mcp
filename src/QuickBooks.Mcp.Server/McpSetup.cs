@@ -63,7 +63,7 @@ public static class McpSetup
             // Progress belongs to the call, so every notification is sent before the result.
             await Task.WhenAll(pending);
             return result;
-        })).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
+        })).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithTools<CustomFieldTools>().WithTools<ChangeTools>().WithTools<DisplayTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
         if (config.AllowPayroll) builder.WithTools<PayrollTools>();
 

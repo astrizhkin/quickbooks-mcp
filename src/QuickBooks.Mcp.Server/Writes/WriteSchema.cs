@@ -33,6 +33,12 @@ public sealed class WriteSchema
     /// <summary>Transaction types TxnDel accepts (e.g. Invoice).</summary>
     public IReadOnlyList<string> TxnDelTypes { get; private init; } = [];
 
+    /// <summary>List types the ListDisplay request can open in the QuickBooks window.</summary>
+    public IReadOnlyList<string> ListDisplayTypes { get; private init; } = [];
+
+    /// <summary>Transaction types the TxnDisplay request can open in the QuickBooks window.</summary>
+    public IReadOnlyList<string> TxnDisplayTypes { get; private init; } = [];
+
     /// <summary>Transaction types TxnVoid accepts.</summary>
     public IReadOnlyList<string> TxnVoidTypes { get; private init; } = [];
 
@@ -129,6 +135,8 @@ public sealed class WriteSchema
             ListDelTypes = Strings(root["listDelTypes"]),
             TxnDelTypes = Strings(root["txnDelTypes"]),
             TxnVoidTypes = Strings(root["txnVoidTypes"]),
+            ListDisplayTypes = Strings(root["listDisplayTypes"]),
+            TxnDisplayTypes = Strings(root["txnDisplayTypes"]),
         };
         foreach (var (name, id) in root["entities"]!.AsObject()) schema._entities[name] = (string)id!;
         foreach (var (path, since) in root["since"]!.AsObject()) schema._since[path] = (string)since!;

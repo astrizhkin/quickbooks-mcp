@@ -141,6 +141,8 @@ var schema = new
     listDelTypes = Enum("ListDelType"),
     txnDelTypes = Enum("TxnDelType"),
     txnVoidTypes = Enum("TxnVoidType"),
+    listDisplayTypes = Enum("ListDisplayModType"),
+    txnDisplayTypes = Enum("TxnDisplayModType"),
 };
 File.WriteAllText(schemaOut, JsonSerializer.Serialize(schema, options));
 File.WriteAllText(requestsOut, JsonSerializer.Serialize(requestSince.Where(kv => kv.Value != versions[0]).ToDictionary(kv => kv.Key, kv => kv.Value), options));
