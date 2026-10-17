@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      # Skipped until the solution exists (issue #4).
+      - name: Restore
+        if: hashFiles('*.sln', '*.slnx') != ''
+        run: dotnet restore
+      - name: Format check
+        if: hashFiles('*.sln', '*.slnx') != ''
+        run: dotnet format --verify-no-changes --no-restore
+      - name: Build
+        if: hashFiles('*.sln', '*.slnx') != ''
+        run: dotnet build --no-restore -c Release
+      # Integration tests skip themselves unless QB_COMPANY_FILE is set.
+      - name: Test
+        if: hashFiles('*.sln', '*.slnx') != ''
+        run: dotnet test --no-build -c Release
