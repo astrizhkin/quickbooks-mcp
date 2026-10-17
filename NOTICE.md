@@ -4,7 +4,7 @@
 QuickBooks and Intuit are trademarks of Intuit Inc. This project is independent and is not affiliated with, endorsed by or sponsored by Intuit.
 
 ## Intuit SDK components
-At runtime this server calls the QuickBooks SDK components that ship with an installed QuickBooks Desktop (`QBXMLRP2.RequestProcessor`). It does not bundle, copy or redistribute any Intuit binary. Intuit's decompiled interop and the SDK sources are never committed to this repository.
+At runtime this server calls the QuickBooks SDK components that ship with an installed QuickBooks Desktop (`QBXMLRP2.RequestProcessor`). It does not bundle, copy or redistribute any Intuit binary. Intuit SDK files and sources are never committed to this repository.
 
 Before 1.0 the Intuit SDK license terms must be reviewed against this project's distribution channels (tracked in the 1.0 checklist).
 

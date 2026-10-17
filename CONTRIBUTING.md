@@ -11,7 +11,7 @@
 
 ## Never commit
 - QuickBooks company files (`*.qbw`, `*.nd`, `*.tlg`, `*.ds`, ...).
-- Intuit's decompiled interop (`Source/`, `Interop.QBFC*.dll`) or any other Intuit binary.
+- Intuit SDK files (`Source/`, `Interop.QBFC*.dll`) or any other Intuit binary.
 - Secrets, tokens or `.env` files.
 
 ## Code
