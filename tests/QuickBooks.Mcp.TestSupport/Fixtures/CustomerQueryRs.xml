@@ -5,6 +5,7 @@
       <ListID>80000001-1000000001</ListID>
       <Name>Example Customer</Name>
       <IsActive>true</IsActive>
+      <EditSequence>1234</EditSequence>
       <Balance>100.00</Balance>
     </CustomerRet>
   </CustomerQueryRs>

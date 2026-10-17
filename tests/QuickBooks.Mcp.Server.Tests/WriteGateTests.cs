@@ -106,3 +106,46 @@ public class WriteGateTests
         Assert.Equal(["Invoice", "Customer"], c.WriteAllow);
     }
 }
+
+public class WriteToolRegistrationTests
+{
+    [Fact]
+    public async Task Enabling_create_registers_the_create_tools_and_the_field_helper()
+    {
+        var names = (await ListTools(["--enable-write"])).Select(t => t.Name).ToList();
+
+        Assert.Contains("create_list_item", names);
+        Assert.Contains("create_sales_transaction", names);
+        Assert.Contains("create_purchase_transaction", names);
+        Assert.Contains("describe_write_fields", names);
+        Assert.DoesNotContain(names, n => n.StartsWith("update_", StringComparison.Ordinal) || n.StartsWith("delete_", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task Without_writes_neither_write_tools_nor_the_helper_exist()
+    {
+        var names = (await ListTools([])).Select(t => t.Name).ToList();
+
+        Assert.DoesNotContain("create_list_item", names);
+        Assert.DoesNotContain("describe_write_fields", names);
+    }
+
+    private static async Task<IList<McpClientTool>> ListTools(string[] args)
+    {
+        var config = ServerConfig.Load(args, new Hashtable());
+        var toServer = new Pipe();
+        var toClient = new Pipe();
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSingleton<IQbClient>(new FixtureQbClient());
+        services.AddQuickBooksMcp(config).WithStreamServerTransport(toServer.Reader.AsStream(), toClient.Writer.AsStream());
+        await using var provider = services.BuildServiceProvider();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        _ = provider.GetRequiredService<McpServer>().RunAsync(cts.Token);
+        await using var client = await McpClient.CreateAsync(
+            new StreamClientTransport(toServer.Writer.AsStream(), toClient.Reader.AsStream()), cancellationToken: cts.Token);
+        var tools = await client.ListToolsAsync(cancellationToken: cts.Token);
+        await cts.CancelAsync();
+        return tools;
+    }
+}

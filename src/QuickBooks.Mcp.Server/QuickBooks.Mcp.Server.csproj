@@ -7,6 +7,9 @@
     <PackageReference Include="ModelContextProtocol" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Writes/write-schema.json" LogicalName="write-schema.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\QuickBooks.Mcp.Core\QuickBooks.Mcp.Core.csproj" />
   </ItemGroup>
 </Project>

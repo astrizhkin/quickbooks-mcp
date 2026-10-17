@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <InvoiceAddRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <InvoiceRet><TxnID>3C-1000000001</TxnID><TxnDate>2025-02-01</TxnDate><RefNumber>1002</RefNumber></InvoiceRet>
+  </InvoiceAddRs>
+</QBXMLMsgsRs></QBXML>

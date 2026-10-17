@@ -31,7 +31,9 @@ public static class McpSetup
         services.AddSingleton(new AuditLog(config.AuditLogPath));
         services.AddSingleton<WriteExecutor>();
 
-        // Write tool classes go here, e.g. builder.AddWriteTools(gate, typeof(InvoiceWriteTools)).
+        services.AddSingleton<RecordWriter>();
+        if (gate.Allows(WriteOp.Create) || gate.Allows(WriteOp.Update) || gate.Allows(WriteOp.Delete)) builder.WithTools<WriteSchemaTools>();
+        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools));
         return builder;
     }
 

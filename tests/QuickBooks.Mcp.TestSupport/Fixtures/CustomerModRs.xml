@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <CustomerModRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <CustomerRet><ListID>80000001-1000000001</ListID><EditSequence>1235</EditSequence><Name>Example Customer</Name></CustomerRet>
+  </CustomerModRs>
+</QBXMLMsgsRs></QBXML>
