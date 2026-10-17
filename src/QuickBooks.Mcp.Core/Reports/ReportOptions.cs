@@ -1,0 +1,95 @@
+using System.Globalization;
+using System.Xml.Linq;
+
+namespace QuickBooks.Mcp.Core.Reports;
+
+/// <summary>Options shared by all report requests; each is added only when set.</summary>
+public sealed class ReportOptions
+{
+    /// <summary>Report period macro, e.g. ThisMonth, LastQuarterToDate, ThisYearToDate.</summary>
+    public string? DateMacro { get; init; }
+
+    /// <summary>Period start (yyyy-MM-dd); used with <see cref="To"/> instead of a macro.</summary>
+    public string? From { get; init; }
+
+    /// <summary>Period end (yyyy-MM-dd).</summary>
+    public string? To { get; init; }
+
+    /// <summary>Accrual or Cash.</summary>
+    public string? Basis { get; init; }
+
+    /// <summary>Column grouping, e.g. Month, Quarter, Year, Customer, Class, TotalOnly.</summary>
+    public string? SummarizeColumnsBy { get; init; }
+
+    /// <summary>Aging reports: ReportDate (default) or Today.</summary>
+    public string? AgingAsOf { get; init; }
+
+    /// <summary>Full names to filter by account.</summary>
+    public IReadOnlyList<string>? Accounts { get; init; }
+
+    /// <summary>Full names to filter by customer, vendor or employee.</summary>
+    public IReadOnlyList<string>? Entities { get; init; }
+
+    /// <summary>Full names to filter by item.</summary>
+    public IReadOnlyList<string>? Items { get; init; }
+
+    /// <summary>Full names to filter by class.</summary>
+    public IReadOnlyList<string>? Classes { get; init; }
+
+    /// <summary>Posting status: Posting, NonPosting or Either.</summary>
+    public string? PostingStatus { get; init; }
+
+    private static readonly string[] Macros =
+    [
+        "All", "Today", "ThisWeek", "ThisWeekToDate", "ThisMonth", "ThisMonthToDate", "ThisQuarter", "ThisQuarterToDate",
+        "ThisYear", "ThisYearToDate", "Yesterday", "LastWeek", "LastWeekToDate", "LastMonth", "LastMonthToDate",
+        "LastQuarter", "LastQuarterToDate", "LastYear", "LastYearToDate", "NextWeek", "NextFourWeeks", "NextMonth",
+        "NextQuarter", "NextYear",
+    ];
+
+    /// <summary>Builds the request children in the order the qbXML schema requires.</summary>
+    public List<XElement> ToElements(ReportKind kind, string type)
+    {
+        var e = new List<XElement> { new(kind.TypeElement, type) };
+
+        if (DateMacro is not null) e.Add(new XElement("ReportDateMacro", Pick(DateMacro, Macros, nameof(DateMacro))));
+        else if (From is not null || To is not null)
+            e.Add(new XElement("ReportPeriod",
+                From is null ? null : new XElement("FromReportDate", Date(From)),
+                To is null ? null : new XElement("ToReportDate", Date(To))));
+
+        AddFilter(e, "ReportAccountFilter", Accounts);
+        AddFilter(e, "ReportEntityFilter", Entities);
+        AddFilter(e, "ReportItemFilter", Items);
+        AddFilter(e, "ReportClassFilter", Classes);
+        if (PostingStatus is not null) e.Add(new XElement("ReportPostingStatusFilter", Pick(PostingStatus, ["Posting", "NonPosting", "Either"], nameof(PostingStatus))));
+
+        var isAging = kind.Request == "AgingReportQueryRq";
+        if (isAging)
+        {
+            if (AgingAsOf is not null) e.Add(new XElement("ReportAgingAsOf", Pick(AgingAsOf, ["ReportEndDate", "Today"], nameof(AgingAsOf))));
+        }
+        else
+        {
+            if (Basis is not null) e.Add(new XElement("ReportBasis", Pick(Basis, ["Accrual", "Cash"], nameof(Basis))));
+            if (SummarizeColumnsBy is not null) e.Add(new XElement("SummarizeColumnsBy", SummarizeColumnsBy));
+        }
+
+        return e;
+    }
+
+    private static void AddFilter(List<XElement> into, string name, IReadOnlyList<string>? fullNames)
+    {
+        if (fullNames is not { Count: > 0 }) return;
+        into.Add(new XElement(name, fullNames.Select(n => new XElement("FullName", n))));
+    }
+
+    private static string Pick(string value, string[] allowed, string name) =>
+        allowed.FirstOrDefault(a => a.Equals(value, StringComparison.OrdinalIgnoreCase))
+        ?? throw new ArgumentException($"{name} must be one of {string.Join(", ", allowed)}, not '{value}'.");
+
+    private static string Date(string text) =>
+        DateOnly.TryParse(text, CultureInfo.InvariantCulture, out var d)
+            ? d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+            : throw new ArgumentException($"'{text}' is not a date; use yyyy-MM-dd.");
+}

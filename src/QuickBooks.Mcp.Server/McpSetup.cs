@@ -22,7 +22,7 @@ public static class McpSetup
         {
             o.ServerInfo = new() { Name = "quickbooks-mcp", Version = "0.1.0" };
             o.ServerInstructions = Instructions;
-        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
+        }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
         // Write tools are registered here only when config.AllowWrites is set (issue #25).
         return builder;
