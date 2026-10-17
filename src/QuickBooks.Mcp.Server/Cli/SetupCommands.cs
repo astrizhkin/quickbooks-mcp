@@ -51,7 +51,7 @@ public static class SetupCommands
         }
         catch (Exception ex) when (ex is COMException or InvalidOperationException or OperationCanceledException)
         {
-            output.WriteLine($"Authorization   : FAILED - {ex.Message}");
+            output.WriteLine($"Authorization   : FAILED - {(ex is COMException com ? QbComErrors.Explain(com) : ex.Message)}");
             output.WriteLine("Run `--authorize` as an Admin in single-user mode, and check that no QuickBooks dialog is open.");
             return false;
         }

@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using ModelContextProtocol;
 using QuickBooks.Mcp.Core.QbXml;
+using QuickBooks.Mcp.Core.Session;
 
 namespace QuickBooks.Mcp.Server.Tools;
 
@@ -20,7 +21,7 @@ public static class ToolErrors
         }
         catch (COMException ex)
         {
-            throw new McpException($"Could not talk to QuickBooks: {ex.Message} Is QuickBooks installed, and has the app been authorized (--authorize)?");
+            throw new McpException($"Could not talk to QuickBooks: {QbComErrors.Explain(ex)}");
         }
         catch (OperationCanceledException)
         {

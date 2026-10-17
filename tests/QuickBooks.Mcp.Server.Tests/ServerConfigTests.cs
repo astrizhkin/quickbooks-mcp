@@ -55,3 +55,14 @@ public class ServerConfigTests
     public void Missing_config_file_is_an_error() =>
         Assert.Throws<ConfigException>(() => ServerConfig.Load(["--config", "nope.json"], Env()));
 }
+
+public class ModeAliasTests
+{
+    [Theory]
+    [InlineData("any", QuickBooks.Mcp.Core.Session.QbFileMode.DoNotCare)]
+    [InlineData("single", QuickBooks.Mcp.Core.Session.QbFileMode.SingleUser)]
+    [InlineData("MULTI", QuickBooks.Mcp.Core.Session.QbFileMode.MultiUser)]
+    [InlineData("MultiUser", QuickBooks.Mcp.Core.Session.QbFileMode.MultiUser)]
+    public void Modes_accept_short_names(string text, QuickBooks.Mcp.Core.Session.QbFileMode expected) =>
+        Assert.Equal(expected, ServerConfig.Load([], new System.Collections.Hashtable { ["QB_MODE"] = text }).Qb.Mode);
+}

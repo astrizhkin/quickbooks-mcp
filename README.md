@@ -2,19 +2,38 @@
 
 Open-source [MCP](https://modelcontextprotocol.io) server that connects **QuickBooks Desktop** (Pro, Premier, Enterprise) to LLMs and agents.
 
-> Status: early scaffolding. Not usable yet.
+> Status: pre-1.0. Built and tested against recorded responses and the qbXML schema; not yet validated across QuickBooks versions (see [COMPATIBILITY.md](docs/COMPATIBILITY.md)).
 
-## Planned
+## What you get
 
-- Read-only queries and reports by default; writes only with `--allow-writes`.
-- Runs over stdio in the user's own Windows session (QuickBooks SDK cannot run as a Windows Service).
-- One-time per-company-file authorization in QuickBooks (`--authorize`).
-- Install via `npx`, `dnx`, the MCP Registry, or a one-click `.mcpb` bundle.
+- **Read:** customers, vendors, employees, items, accounts, invoices, bills, payments, inventory, time, custom fields, and every standard report (aging, P&L, balance sheet, ...), as compact tables.
+- **Change, only if you allow it:** create, update, delete and void, with previews, confirmation tokens, idempotency keys, batches and an audit log.
+- **Safe by default:** read-only, tax IDs and bank and card numbers masked, payroll off, card data never accepted.
+- **Local:** runs on your Windows PC next to QuickBooks and talks to it through its SDK. No cloud, no telemetry.
+
+## Install
+
+| | |
+|---|---|
+| Claude Desktop | open the `.mcpb` from the [latest release](https://github.com/devwithmj/quickbooks-mcp/releases) |
+| npx | `npx -y @devwithmj/quickbooks-mcp` |
+| dnx | `dnx DevWithMJ.QuickBooks.Mcp --yes` |
+| exe | `quickbooks-mcp-win-x64.exe` (or `-win-x86`) from the release |
+
+Then allow access once in QuickBooks (`--authorize`) and add the server to your AI app. Step by step: **[docs/GUIDE.md](docs/GUIDE.md)**.
 
 ## Requirements
 
-- Windows, QuickBooks Desktop installed and licensed.
+- Windows with QuickBooks Desktop installed and licensed.
 - Admin access to the company file for the one-time authorization.
+
+## Documentation
+
+- [User guide](docs/GUIDE.md): install, authorize, connect clients, troubleshoot, FAQ
+- [Tools](docs/TOOLS.md): every tool, parameter and example
+- [Writes](docs/WRITES.md) and [Reports](docs/REPORTS.md)
+- [Security model](docs/SECURITY-MODEL.md)
+- [Releasing](docs/RELEASING.md), [Testing](docs/TESTING.md), [Contributing](CONTRIBUTING.md)
 
 ## Legal
 

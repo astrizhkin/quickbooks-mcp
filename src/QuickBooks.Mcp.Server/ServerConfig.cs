@@ -62,7 +62,7 @@ public sealed class ServerConfig
             {
                 CompanyFile = values.GetValueOrDefault("COMPANY_FILE"),
                 Mode = values.TryGetValue("MODE", out var mode)
-                    ? ParseEnum<QbFileMode>("MODE", mode)
+                    ? ParseEnum<QbFileMode>("MODE", mode.ToLowerInvariant() switch { "any" => "DoNotCare", "single" => "SingleUser", "multi" => "MultiUser", _ => mode })
                     : defaults.Mode,
                 Timeout = TimeSpan.FromSeconds(ParseInt(values, "TIMEOUT_SECONDS", (int)defaults.Timeout.TotalSeconds, 1)),
                 MaxRetries = ParseInt(values, "MAX_RETRIES", defaults.MaxRetries, 0),
