@@ -1,2 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <EmbeddedResource Include="QbXml/qbxml-request-versions.json" LogicalName="qbxml-request-versions.json" />
+  </ItemGroup>
 </Project>

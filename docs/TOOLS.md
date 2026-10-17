@@ -842,7 +842,7 @@ Needs: nothing (always available). Example: *"List the payment terms."*
 
 ### `describe_write_fields`
 
-List the field names accepted by create or update for an entity, as a tree. Empty text is a plain value, [..] is a repeatable element, nested objects are groups such as addresses and lines.
+List the field names accepted by create or update for an entity, as a tree. Empty text is a plain value, [..] is a repeatable element, nested objects are groups such as addresses and lines, and a value like 12.0+ means that field needs qbXML 12.0 or a newer QuickBooks.
 
 Needs: any write switch. Example: *"What fields can I set when creating an invoice?"*
 

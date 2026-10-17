@@ -14,7 +14,9 @@ namespace QuickBooks.Mcp.Server.Writes;
 /// <param name="Entity">The entity being changed, for the allowlist and the audit log, e.g. "Customer".</param>
 /// <param name="Request">The request element name, e.g. <c>CustomerAddRq</c>.</param>
 /// <param name="Children">The request's child elements.</param>
-public sealed record WriteCall(WriteOp Op, string Entity, string Request, IReadOnlyList<XElement> Children);
+/// <param name="Needs">Fields used that first appeared in a later qbXML version, checked against the installed QuickBooks.</param>
+public sealed record WriteCall(
+    WriteOp Op, string Entity, string Request, IReadOnlyList<XElement> Children, IReadOnlyList<(string Path, string Since)>? Needs = null);
 
 /// <summary>
 /// The single path every write tool takes: gate check, optional dry run, a two-step confirmation
@@ -73,7 +75,12 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, 
 
         try
         {
-            var reply = await qb.SendAsync(v => QbXmlRequest.Build(v, call.Request, call.Children), cancellationToken);
+            var reply = await qb.SendAsync(v =>
+            {
+                QbVersions.EnsureRequest(call.Request, v);
+                QbVersions.EnsureFields(call.Needs ?? [], v);
+                return QbXmlRequest.Build(v, call.Request, call.Children);
+            }, cancellationToken);
             var response = QbXmlResponse.Parse(reply);
             var ids = response.Records.Select(r => (string?)r.Element("ListID") ?? (string?)r.Element("TxnID")).OfType<string>().ToList();
             audit.Append("ok", call.Op, call.Entity, hash, ids);

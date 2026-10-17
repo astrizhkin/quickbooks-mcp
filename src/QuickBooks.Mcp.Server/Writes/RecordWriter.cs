@@ -17,9 +17,10 @@ public sealed class RecordWriter(IQbClient qb, WriteExecutor executor)
         IReadOnlyCollection<string> allowed, string entity, JsonElement data, bool dryRun, CancellationToken cancellationToken, string? idempotencyKey = null)
     {
         var name = Canonical(allowed, entity);
-        var element = Schema.Build(name, "Add", AsObject(data));
+        var needs = new List<(string Path, string Since)>();
+        var element = Schema.Build(name, "Add", AsObject(data), needs);
         if (name == "JournalEntry") EnsureBalanced(element);
-        return executor.ExecuteAsync(new WriteCall(WriteOp.Create, name, name + "AddRq", [element]), dryRun, null, cancellationToken, idempotencyKey);
+        return executor.ExecuteAsync(new WriteCall(WriteOp.Create, name, name + "AddRq", [element], needs), dryRun, null, cancellationToken, idempotencyKey);
     }
 
     /// <summary>
@@ -38,8 +39,9 @@ public sealed class RecordWriter(IQbClient qb, WriteExecutor executor)
 
         fields[found.IsTransaction ? "TxnID" : "ListID"] = id;
         fields["EditSequence"] = editSequence;
-        var element = Schema.Build(name, "Mod", fields);
-        return await executor.ExecuteAsync(new WriteCall(WriteOp.Update, name, name + "ModRq", [element]), dryRun, null, cancellationToken);
+        var needs = new List<(string Path, string Since)>();
+        var element = Schema.Build(name, "Mod", fields, needs);
+        return await executor.ExecuteAsync(new WriteCall(WriteOp.Update, name, name + "ModRq", [element], needs), dryRun, null, cancellationToken);
     }
 
     // Catches the most common model mistake before QuickBooks does: debits that do not equal credits.

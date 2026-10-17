@@ -23,7 +23,11 @@ public static class QbClientExtensions
         IEnumerable<XElement>? children = null,
         CancellationToken cancellationToken = default)
     {
-        var reply = await client.SendAsync(v => QbXmlRequest.Build(v, requestName, children), cancellationToken);
+        var reply = await client.SendAsync(v =>
+        {
+            QbVersions.EnsureRequest(requestName, v);
+            return QbXmlRequest.Build(v, requestName, children);
+        }, cancellationToken);
         return QbXmlResponse.Parse(reply);
     }
 }

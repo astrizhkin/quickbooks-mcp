@@ -38,3 +38,11 @@ Older years and newer ones follow the same procedure. Add rows rather than assum
 - Features that need QuickBooks Enterprise (inventory sites, per-site stock, advanced inventory, some reports) return QuickBooks' error on Pro and Premier.
 - Bitness: older QuickBooks registers only a 32-bit request processor (use the `win-x86` build); newer registers a 64-bit one too. `--doctor` shows what the machine has.
 - Multi-currency, budgets and other company options change what a file contains; the sample file does not cover them (#60).
+
+## qbXML versions
+QuickBooks reports the newest qbXML version it understands; the server uses the highest one up to 17.0. Newer features fail early with a clear message instead of a parser error:
+
+- A request that first appeared in a newer version is refused before it is sent (for example inventory sites need 10.0 and leads need 13.0).
+- A field in a create or update that is newer than the installed version is refused by name (`CustomerAdd/ClassRef needs 12.0`), and nothing is sent. `describe_write_fields` marks such fields with `12.0+`.
+- The tables are generated from Intuit's schema history (`tools/write-schema`): `qbxml-request-versions.json` for requests and the `since` map in `write-schema.json` for fields.
+- Reports and the filters on queries use long-standing elements and are not version-checked individually; if one fails on an old QuickBooks, QuickBooks' own message is shown.
