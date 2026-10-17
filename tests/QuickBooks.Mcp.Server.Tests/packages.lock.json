@@ -376,7 +376,7 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
-      "quickbooks-mcp": {
+      "DevWithMJ.QuickBooks.Mcp": {
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Hosting": "[10.0.13, )",

@@ -30,3 +30,15 @@ After the release exists, the `npm` job in the same workflow publishes `packagin
 SHA-256 values written into `checksums.json` and npm provenance enabled. The launcher downloads the executable for its own version from the
 GitHub release, refuses it unless it matches that checksum, caches it under `%LOCALAPPDATA%\quickbooks-mcp`, and runs it. It needs an
 `NPM_TOKEN` repository secret. For development, `QB_MCP_EXE` points the launcher at a local build.
+
+## NuGet package (dnx)
+The `nuget` job packs `src/QuickBooks.Mcp.Server` as the .NET tool `DevWithMJ.QuickBooks.Mcp` (package types `DotnetTool` and `McpServer`,
+with `.mcp/server.json` stamped with the release version) and pushes it to nuget.org; it needs a `NUGET_API_KEY` secret.
+
+```
+dnx DevWithMJ.QuickBooks.Mcp --yes
+```
+
+This runs on the machine's .NET 10 runtime, so its bitness is the machine's `dotnet`. If QuickBooks only registers a 32-bit request
+processor, use the 32-bit .NET or the `win-x86` executable instead. Try a local package with
+`dotnet pack -o nupkg` then `dnx DevWithMJ.QuickBooks.Mcp --version <v> --source nupkg --yes -- --doctor`.

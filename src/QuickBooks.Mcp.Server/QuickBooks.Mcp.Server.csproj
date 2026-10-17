@@ -4,6 +4,32 @@
     <AssemblyName>quickbooks-mcp</AssemblyName>
     <Version Condition="'$(Version)' == ''">0.1.0</Version>
   </PropertyGroup>
+  <!-- A NuGet package that dnx can run (dnx DevWithMJ.QuickBooks.Mcp). -->
+  <PropertyGroup>
+    <PackageId>DevWithMJ.QuickBooks.Mcp</PackageId>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>quickbooks-mcp</ToolCommandName>
+    <PackageType>McpServer</PackageType>
+    <Description>MCP server for QuickBooks Desktop (Windows). Read-only by default.</Description>
+    <PackageTags>mcp;model-context-protocol;quickbooks;quickbooks-desktop;accounting</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/devwithmj/quickbooks-mcp</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/devwithmj/quickbooks-mcp</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <!-- The registry metadata ships inside the package, stamped with this build's version. -->
+  <Target Name="StampServerJson" BeforeTargets="_GetPackageFiles">
+    <PropertyGroup>
+      <ServerJson>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)../../packaging/server.json').Replace('__VERSION__', '$(Version)'))</ServerJson>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)server.json" Lines="$([MSBuild]::Escape($(ServerJson)))" Overwrite="true" />
+    <ItemGroup>
+      <None Include="$(IntermediateOutputPath)server.json" Pack="true" PackagePath=".mcp/server.json" />
+    </ItemGroup>
+  </Target>
   <!-- A release build is a self-contained single file per architecture:
        dotnet publish src/QuickBooks.Mcp.Server -c Release -r win-x64 (or win-x86). Not trimmed: the COM calls are late-bound. -->
   <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
