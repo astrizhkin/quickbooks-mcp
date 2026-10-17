@@ -25,7 +25,7 @@ public class LockingQbClientTests
     public async Task Calls_to_same_file_never_overlap()
     {
         var inner = new FakeClient(_ => "ok");
-        var options = new QbOptions { CompanyFile = $@"C:\test\{Guid.NewGuid()}.qbw" };
+        var options = new QbOptions { LockName = Guid.NewGuid().ToString() };
         // Two instances stand in for two server processes sharing one named mutex.
         var a = new LockingQbClient(inner, options);
         var b = new LockingQbClient(inner, options);

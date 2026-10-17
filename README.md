@@ -33,7 +33,7 @@ Not for QuickBooks Online (Intuit has its own MCP server), QuickBooks for Mac (n
 
 - [User guide](docs/GUIDE.md): install, authorize, connect clients, troubleshoot, FAQ
 - [Tools](docs/TOOLS.md): every tool, parameter and example
-- [Writes](docs/WRITES.md) and [Reports](docs/REPORTS.md)
+- [Prompt cookbook](docs/COOKBOOK.md), [Writes](docs/WRITES.md) and [Reports](docs/REPORTS.md)
 - [Scope and non-goals](docs/SCOPE.md) and [security model](docs/SECURITY-MODEL.md)
 - [Releasing](docs/RELEASING.md), [Testing](docs/TESTING.md), [Contributing](CONTRIBUTING.md)
 
