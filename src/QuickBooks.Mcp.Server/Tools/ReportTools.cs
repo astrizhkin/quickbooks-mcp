@@ -98,6 +98,8 @@ public sealed class ReportTools(IQbClient qb)
         [Description("Only these items (full names).")] string[]? items = null,
         [Description("Only these classes (full names).")] string[]? classes = null,
         [Description("Posting, NonPosting or Either.")] string? postingStatus = null,
+        [Description("Custom reports: row grouping such as Account, Customer, Item or Month.")] string? summarizeRowsBy = null,
+        [Description("Detail and custom reports: extra columns such as Amount, Date, Memo, Name, Num, Balance.")] string[]? includeColumns = null,
         CancellationToken cancellationToken = default) =>
         Run(reportType, new ReportOptions
         {
@@ -111,6 +113,8 @@ public sealed class ReportTools(IQbClient qb)
             Items = items,
             Classes = classes,
             PostingStatus = postingStatus,
+            SummarizeRowsBy = summarizeRowsBy,
+            IncludeColumns = includeColumns,
         }, cancellationToken);
 
     private Task<string> Aging(string type, string? asOfDate, string[]? entities, CancellationToken cancellationToken) =>

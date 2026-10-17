@@ -21,7 +21,13 @@ public sealed class ReportOptions
     /// <summary>Column grouping, e.g. Month, Quarter, Year, Customer, Class, TotalOnly.</summary>
     public string? SummarizeColumnsBy { get; init; }
 
-    /// <summary>Aging reports: ReportDate (default) or Today.</summary>
+    /// <summary>Row grouping for custom reports, e.g. Account, Customer, Item, Month.</summary>
+    public string? SummarizeRowsBy { get; init; }
+
+    /// <summary>Extra columns for detail and custom reports, e.g. Amount, Date, Memo, Name, Num, Balance.</summary>
+    public IReadOnlyList<string>? IncludeColumns { get; init; }
+
+    /// <summary>Aging reports: ReportEndDate (default) or Today.</summary>
     public string? AgingAsOf { get; init; }
 
     /// <summary>Full names to filter by account.</summary>
@@ -73,6 +79,8 @@ public sealed class ReportOptions
         {
             if (Basis is not null) e.Add(new XElement("ReportBasis", Pick(Basis, ["Accrual", "Cash"], nameof(Basis))));
             if (SummarizeColumnsBy is not null) e.Add(new XElement("SummarizeColumnsBy", SummarizeColumnsBy));
+            if (SummarizeRowsBy is not null) e.Add(new XElement("SummarizeRowsBy", SummarizeRowsBy));
+            e.AddRange((IncludeColumns ?? []).Select(c => new XElement("IncludeColumn", c)));
         }
 
         return e;

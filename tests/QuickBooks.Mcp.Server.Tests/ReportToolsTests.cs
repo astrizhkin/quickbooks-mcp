@@ -78,3 +78,17 @@ public class SummaryDetailReportToolsTests
         Assert.Contains("ProfitAndLossByClass", qb.Requests[0].ToString());
     }
 }
+
+public class CustomReportToolsTests
+{
+    [Fact]
+    public async Task Custom_options_reach_the_request()
+    {
+        var qb = new FixtureQbClient();
+
+        await new ReportTools(qb).GetReport("CustomSummary", "ThisYear", summarizeRowsBy: "Account", includeColumns: ["Amount"]);
+
+        Assert.Contains("SummarizeRowsBy", qb.Requests[0].ToString());
+        Assert.Contains("IncludeColumn", qb.Requests[0].ToString());
+    }
+}

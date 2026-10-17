@@ -56,3 +56,29 @@ public class ReportTests
         Assert.Equal("Other customers", (string?)rows[1]!["cells"]![0]);
     }
 }
+
+public class ReportDocsTests
+{
+    [Fact]
+    public void Every_report_type_is_documented()
+    {
+        var dir = AppContext.BaseDirectory;
+        while (!File.Exists(Path.Combine(dir, "docs", "REPORTS.md"))) dir = Path.GetDirectoryName(dir)!;
+        var docs = File.ReadAllText(Path.Combine(dir, "docs", "REPORTS.md"));
+
+        var missing = ReportKind.All.SelectMany(k => k.Types).Where(t => !docs.Contains(t, StringComparison.Ordinal));
+
+        Assert.Empty(missing);
+    }
+
+    [Fact]
+    public void Custom_options_are_sent()
+    {
+        var (kind, type) = ReportKind.Find("CustomSummary")!.Value;
+
+        var names = new ReportOptions { SummarizeRowsBy = "Account", IncludeColumns = ["Amount"] }
+            .ToElements(kind, type).Select(e => e.Name.LocalName);
+
+        Assert.Equal(["CustomSummaryReportType", "SummarizeRowsBy", "IncludeColumn"], names);
+    }
+}
