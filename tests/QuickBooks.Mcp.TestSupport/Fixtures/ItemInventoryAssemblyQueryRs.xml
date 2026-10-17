@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <ItemInventoryAssemblyQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <ItemInventoryAssemblyRet>
+      <ListID>80000001-3000000001</ListID>
+      <Name>Example ItemInventoryAssembly</Name>
+      <IsActive>true</IsActive>
+    </ItemInventoryAssemblyRet>
+  </ItemInventoryAssemblyQueryRs>
+</QBXMLMsgsRs></QBXML>

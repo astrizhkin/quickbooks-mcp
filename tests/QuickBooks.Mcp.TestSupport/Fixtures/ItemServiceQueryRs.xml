@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <ItemServiceQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <ItemServiceRet>
+      <ListID>80000001-3000000001</ListID>
+      <Name>Example ItemService</Name>
+      <IsActive>true</IsActive>
+    </ItemServiceRet>
+  </ItemServiceQueryRs>
+</QBXMLMsgsRs></QBXML>
