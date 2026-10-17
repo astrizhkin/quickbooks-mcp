@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using ModelContextProtocol.Server;
 using QuickBooks.Mcp.Server.Prompts;
 using QuickBooks.Mcp.Server.Resources;
 using QuickBooks.Mcp.Server.Tools;
+using QuickBooks.Mcp.Server.Writes;
 
 namespace QuickBooks.Mcp.Server;
 
@@ -24,7 +26,20 @@ public static class McpSetup
             o.ServerInstructions = Instructions;
         }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
-        // Write tools are registered here only when config.AllowWrites is set (issue #25).
+        var gate = WriteGate.From(config);
+        services.AddSingleton(gate);
+
+        // Write tool classes go here, e.g. builder.AddWriteTools(gate, typeof(InvoiceWriteTools)).
         return builder;
     }
+
+    /// <summary>
+    /// Registers the tools of <paramref name="toolTypes"/> whose operation (from the create_, update_,
+    /// delete_ or void_ name prefix) is enabled in <paramref name="gate"/>; the others do not exist for the client.
+    /// </summary>
+    public static IMcpServerBuilder AddWriteTools(this IMcpServerBuilder builder, WriteGate gate, params Type[] toolTypes) =>
+        builder.WithTools(toolTypes.SelectMany(type => type.GetMethods()
+            .Select(method => (method, name: method.GetCustomAttribute<McpServerToolAttribute>()?.Name))
+            .Where(t => t.name is not null && gate.Allows(WriteOps.FromToolName(t.name)))
+            .Select(t => McpServerTool.Create(t.method, ctx => ActivatorUtilities.CreateInstance(ctx.Services!, type)))));
 }

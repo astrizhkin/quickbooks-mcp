@@ -1,5 +1,6 @@
 using System.Collections;
 using QuickBooks.Mcp.Core.Session;
+using QuickBooks.Mcp.Server.Writes;
 
 namespace QuickBooks.Mcp.Server.Tests;
 
@@ -13,7 +14,7 @@ public class ServerConfigTests
     {
         var c = ServerConfig.Load([], Env());
 
-        Assert.False(c.AllowWrites);
+        Assert.Equal(WriteOp.None, c.Writes);
         Assert.Null(c.Qb.CompanyFile);
         Assert.Equal(QbFileMode.DoNotCare, c.Qb.Mode);
     }
@@ -31,7 +32,7 @@ public class ServerConfigTests
             Assert.Equal("cli.qbw", c.Qb.CompanyFile);
             Assert.Equal(QbFileMode.MultiUser, c.Qb.Mode);
             Assert.Equal(7, c.Qb.MaxRetries);
-            Assert.True(c.AllowWrites);
+            Assert.Equal(WriteOp.All, c.Writes);
         }
         finally
         {

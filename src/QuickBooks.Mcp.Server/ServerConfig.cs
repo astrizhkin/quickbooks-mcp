@@ -2,6 +2,7 @@ using System.Collections;
 using System.Globalization;
 using System.Text.Json;
 using QuickBooks.Mcp.Core.Session;
+using QuickBooks.Mcp.Server.Writes;
 
 namespace QuickBooks.Mcp.Server;
 
@@ -16,13 +17,16 @@ public sealed class ConfigException(string message) : Exception(message);
 public sealed class ServerConfig
 {
     private static readonly string[] Keys =
-        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL"];
+        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL"];
 
     /// <summary>Connection settings passed to the QuickBooks client.</summary>
     public required QbOptions Qb { get; init; }
 
-    /// <summary>Whether write tools are registered.</summary>
-    public bool AllowWrites { get; init; }
+    /// <summary>Which kinds of change are enabled. None by default; ALLOW_WRITES enables all.</summary>
+    public WriteOp Writes { get; init; }
+
+    /// <summary>Entities writes are limited to (QB_WRITE_ALLOW=Invoice,Customer); null means any.</summary>
+    public IReadOnlyList<string>? WriteAllow { get; init; }
 
     /// <summary>Whether sensitive data (tax IDs, bank and card numbers, payroll) is redacted from results. On by default.</summary>
     public bool Redact { get; init; }
@@ -57,7 +61,10 @@ public sealed class ServerConfig
                 Timeout = TimeSpan.FromSeconds(ParseInt(values, "TIMEOUT_SECONDS", (int)defaults.Timeout.TotalSeconds, 1)),
                 MaxRetries = ParseInt(values, "MAX_RETRIES", defaults.MaxRetries, 0),
             },
-            AllowWrites = ParseBool(values, "ALLOW_WRITES", fallback: false),
+            Writes = ParseWrites(values),
+            WriteAllow = values.TryGetValue("WRITE_ALLOW", out var allow)
+                ? allow.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                : null,
             Redact = ParseBool(values, "REDACT", fallback: true),
             LogLevel = values.TryGetValue("LOG_LEVEL", out var level)
                 ? ParseEnum<LogLevelName>("LOG_LEVEL", level).ToString()
@@ -95,6 +102,16 @@ public sealed class ServerConfig
         {
             throw new ConfigException($"Config file {path} is not valid JSON: {ex.Message}");
         }
+    }
+
+    private static WriteOp ParseWrites(Dictionary<string, string> values)
+    {
+        var all = ParseBool(values, "ALLOW_WRITES", fallback: false);
+        var ops = WriteOp.None;
+        if (all || ParseBool(values, "ENABLE_WRITE", fallback: false)) ops |= WriteOp.Create;
+        if (all || ParseBool(values, "ENABLE_UPDATE", fallback: false)) ops |= WriteOp.Update;
+        if (all || ParseBool(values, "ENABLE_DELETE", fallback: false)) ops |= WriteOp.Delete;
+        return ops;
     }
 
     private static bool ParseBool(Dictionary<string, string> values, string key, bool fallback) =>
