@@ -101,6 +101,12 @@
       },
       "quickbooks.mcp.core": {
         "type": "Project"
+      },
+      "quickbooks.mcp.testsupport": {
+        "type": "Project",
+        "dependencies": {
+          "QuickBooks.Mcp.Core": "[1.0.0, )"
+        }
       }
     }
   }

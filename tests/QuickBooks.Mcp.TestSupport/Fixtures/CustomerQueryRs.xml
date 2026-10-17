@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <CustomerQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <CustomerRet>
+      <ListID>80000001-1000000001</ListID>
+      <Name>Example Customer</Name>
+      <IsActive>true</IsActive>
+      <Balance>100.00</Balance>
+    </CustomerRet>
+  </CustomerQueryRs>
+</QBXMLMsgsRs></QBXML>

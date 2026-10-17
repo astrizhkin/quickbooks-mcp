@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <CompanyQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <CompanyRet>
+      <IsSampleCompany>true</IsSampleCompany>
+      <CompanyName>Sample Company</CompanyName>
+      <LegalCompanyName>Sample Company LLC</LegalCompanyName>
+    </CompanyRet>
+  </CompanyQueryRs>
+</QBXMLMsgsRs></QBXML>

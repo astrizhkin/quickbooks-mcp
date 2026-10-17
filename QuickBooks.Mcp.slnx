@@ -6,5 +6,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/QuickBooks.Mcp.Core.Tests/QuickBooks.Mcp.Core.Tests.csproj" />
     <Project Path="tests/QuickBooks.Mcp.Server.Tests/QuickBooks.Mcp.Server.Tests.csproj" />
+    <Project Path="tests/QuickBooks.Mcp.TestSupport/QuickBooks.Mcp.TestSupport.csproj" />
   </Folder>
 </Solution>
