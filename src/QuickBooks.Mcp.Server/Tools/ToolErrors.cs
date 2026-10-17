@@ -26,7 +26,7 @@ public static class ToolErrors
         {
             throw new McpException("QuickBooks did not answer in time. It may be busy or showing a dialog; try again.");
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
             throw new McpException(ex.Message);
         }
