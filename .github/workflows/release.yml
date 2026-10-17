@@ -29,7 +29,7 @@ jobs:
           dotnet publish src/QuickBooks.Mcp.Server -c Release -r ${{ matrix.rid }} -p:Version="$version" -o out
           cp out/quickbooks-mcp.exe "quickbooks-mcp-${{ matrix.rid }}.exe"
           sha256sum "quickbooks-mcp-${{ matrix.rid }}.exe" > "quickbooks-mcp-${{ matrix.rid }}.exe.sha256"
-      - uses: actions/attest-build-provenance@v2
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: quickbooks-mcp-${{ matrix.rid }}.exe
       - uses: actions/upload-artifact@v7
