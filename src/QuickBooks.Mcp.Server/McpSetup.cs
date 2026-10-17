@@ -29,11 +29,12 @@ public static class McpSetup
         var gate = WriteGate.From(config);
         services.AddSingleton(gate);
         services.AddSingleton(new AuditLog(config.AuditLogPath));
+        services.AddSingleton(new IdempotencyStore(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(config.AuditLogPath))!, "idempotency.jsonl")));
         services.AddSingleton<WriteExecutor>();
 
         services.AddSingleton<RecordWriter>();
         if (gate.Allows(WriteOp.Create) || gate.Allows(WriteOp.Update) || gate.Allows(WriteOp.Delete)) builder.WithTools<WriteSchemaTools>();
-        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(DeleteTools));
+        builder.AddWriteTools(gate, typeof(ListWriteTools), typeof(SalesWriteTools), typeof(PurchaseWriteTools), typeof(DeleteTools), typeof(BatchWriteTools));
         return builder;
     }
 

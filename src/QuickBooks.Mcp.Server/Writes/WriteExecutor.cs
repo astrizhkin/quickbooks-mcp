@@ -20,7 +20,7 @@ public sealed record WriteCall(WriteOp Op, string Entity, string Request, IReadO
 /// The single path every write tool takes: gate check, optional dry run, a two-step confirmation
 /// for deletes and voids, the call itself, and the audit entry.
 /// </summary>
-public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit)
+public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit, IdempotencyStore? idempotency = null)
 {
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromMinutes(5);
     private readonly ConcurrentDictionary<string, (string Hash, DateTimeOffset Expires)> _tokens = new();
@@ -28,8 +28,10 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit)
     /// <summary>
     /// Runs <paramref name="call"/>. With <paramref name="dryRun"/> nothing is sent and the request is shown.
     /// Deletes and voids first return a preview and a token; calling again with that token performs them.
+    /// A create with an <paramref name="idempotencyKey"/> already used for the same request returns the earlier result instead of creating again.
     /// </summary>
-    public async Task<string> ExecuteAsync(WriteCall call, bool dryRun, string? confirmationToken, CancellationToken cancellationToken)
+    public async Task<string> ExecuteAsync(
+        WriteCall call, bool dryRun, string? confirmationToken, CancellationToken cancellationToken, string? idempotencyKey = null)
     {
         gate.Require(call.Op, call.Entity);
 
@@ -60,13 +62,22 @@ public sealed class WriteExecutor(IQbClient qb, WriteGate gate, AuditLog audit)
                 throw new McpException("The confirmation token is invalid, expired or for a different request. Request a new preview.");
         }
 
+        if (idempotencyKey is not null && idempotency is not null && call.Op == WriteOp.Create
+            && idempotency.Find(idempotencyKey, hash) is { } earlier)
+        {
+            audit.Append("duplicate", call.Op, call.Entity, hash, []);
+            return new JsonObject { ["duplicate"] = true, ["message"] = "This idempotency key was already used; nothing was created.", ["result"] = JsonNode.Parse(earlier) }.ToJsonString();
+        }
+
         try
         {
             var reply = await qb.SendAsync(v => QbXmlRequest.Build(v, call.Request, call.Children), cancellationToken);
             var response = QbXmlResponse.Parse(reply);
             var ids = response.Records.Select(r => (string?)r.Element("ListID") ?? (string?)r.Element("TxnID")).OfType<string>().ToList();
             audit.Append("ok", call.Op, call.Entity, hash, ids);
-            return new JsonObject { ["status"] = "ok", ["records"] = JsonNode.Parse(QbXmlJson.ToJson(response.Records)) }.ToJsonString();
+            var result = new JsonObject { ["status"] = "ok", ["records"] = JsonNode.Parse(QbXmlJson.ToJson(response.Records)) }.ToJsonString();
+            if (idempotencyKey is not null && call.Op == WriteOp.Create) idempotency?.Add(idempotencyKey, hash, result);
+            return result;
         }
         catch (Exception ex)
         {

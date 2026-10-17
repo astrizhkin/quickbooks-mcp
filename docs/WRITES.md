@@ -37,3 +37,11 @@ Voiding keeps the transaction in the books at zero; deleting removes it. Prefer 
 - **List items that can be deleted:** Account, BillingRate, Class, Currency, Customer, CustomerMsg, CustomerType, DateDrivenTerms, Employee, InventorySite, ItemDiscount, ItemFixedAsset, ItemGroup, ItemInventory, ItemInventoryAssembly, ItemNonInventory, ItemOtherCharge, ItemPayment, ItemSalesTax, ItemSalesTaxGroup, ItemService, ItemSubtotal, JobType, OtherName, PaymentMethod, PayrollItemNonWage, PayrollItemWage, PriceLevel, SalesRep, SalesTaxCode, ShipMethod, StandardTerms, ToDo, UnitOfMeasureSet, Vehicle, Vendor, VendorType, WorkersCompCode
 
 Estimates, sales orders and purchase orders can be deleted but not voided.
+
+## Batches and retries
+`create_records` creates up to 50 records in one call (`[{ "entity", "data", "idempotencyKey" }]`). Items run in order, each in its own
+short QuickBooks session; a failed item is reported and the rest continue unless `stopOnError` is true.
+
+Every create tool and every batch item accepts an `idempotencyKey`. The first success is remembered (next to the audit log,
+`idempotency.jsonl`); sending the same key with the same request again returns the first result instead of creating a second
+record, and reusing a key for a different request is refused. Dry runs never use up a key.

@@ -13,12 +13,13 @@ public sealed class RecordWriter(IQbClient qb, WriteExecutor executor)
     private static readonly WriteSchema Schema = WriteSchema.Instance;
 
     /// <summary>Creates a record (<c>{Entity}AddRq</c>).</summary>
-    public Task<string> CreateAsync(IReadOnlyCollection<string> allowed, string entity, JsonElement data, bool dryRun, CancellationToken cancellationToken)
+    public Task<string> CreateAsync(
+        IReadOnlyCollection<string> allowed, string entity, JsonElement data, bool dryRun, CancellationToken cancellationToken, string? idempotencyKey = null)
     {
         var name = Canonical(allowed, entity);
         var element = Schema.Build(name, "Add", AsObject(data));
         if (name == "JournalEntry") EnsureBalanced(element);
-        return executor.ExecuteAsync(new WriteCall(WriteOp.Create, name, name + "AddRq", [element]), dryRun, null, cancellationToken);
+        return executor.ExecuteAsync(new WriteCall(WriteOp.Create, name, name + "AddRq", [element]), dryRun, null, cancellationToken, idempotencyKey);
     }
 
     /// <summary>

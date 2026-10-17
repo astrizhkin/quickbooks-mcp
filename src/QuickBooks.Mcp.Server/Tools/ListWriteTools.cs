@@ -9,7 +9,8 @@ namespace QuickBooks.Mcp.Server.Tools;
 [McpServerToolType]
 public sealed class ListWriteTools(RecordWriter writer)
 {
-    private static readonly string[] Entities = ["Account", "Class", "Customer", "Vendor", "Employee", "OtherName", "Lead", "ItemService", "ItemNonInventory", "ItemInventory", "ItemInventoryAssembly", "ItemOtherCharge", "ItemDiscount", "ItemSalesTax", "ItemSalesTaxGroup", "ItemGroup", "ItemSubtotal", "ItemPayment", "ItemFixedAsset", "StandardTerms", "DateDrivenTerms", "PaymentMethod", "SalesTaxCode", "SalesRep", "Vehicle", "BillingRate", "PriceLevel", "WorkersCompCode", "CustomerType", "VendorType", "JobType", "ShipMethod", "CustomerMsg"];
+    /// <summary>The entities these tools accept.</summary>
+    public static readonly string[] Entities = ["Account", "Class", "Customer", "Vendor", "Employee", "OtherName", "Lead", "ItemService", "ItemNonInventory", "ItemInventory", "ItemInventoryAssembly", "ItemOtherCharge", "ItemDiscount", "ItemSalesTax", "ItemSalesTaxGroup", "ItemGroup", "ItemSubtotal", "ItemPayment", "ItemFixedAsset", "StandardTerms", "DateDrivenTerms", "PaymentMethod", "SalesTaxCode", "SalesRep", "Vehicle", "BillingRate", "PriceLevel", "WorkersCompCode", "CustomerType", "VendorType", "JobType", "ShipMethod", "CustomerMsg"];
 
     /// <summary>Creates a record.</summary>
     [McpServerTool(Name = "create_list_item", ReadOnly = false, Destructive = false)]
@@ -18,8 +19,9 @@ public sealed class ListWriteTools(RecordWriter writer)
         [Description("One of: Account,Class,Customer,Vendor,Employee,OtherName,Lead,ItemService,ItemNonInventory,ItemInventory,ItemInventoryAssembly,ItemOtherCharge,ItemDiscount,ItemSalesTax,ItemSalesTaxGroup,ItemGroup,ItemSubtotal,ItemPayment,ItemFixedAsset,StandardTerms,DateDrivenTerms,PaymentMethod,SalesTaxCode,SalesRep,Vehicle,BillingRate,PriceLevel,WorkersCompCode,CustomerType,VendorType,JobType,ShipMethod,CustomerMsg.")] string entity,
         [Description("Fields by qbXML element name, e.g. {\"Name\":\"Acme\",\"BillAddress\":{\"Addr1\":\"1 Main St\"}}. References are {\"FullName\":\"...\"} or {\"ListID\":\"...\"}; repeated elements (lines) are arrays.")] JsonElement data,
         [Description("true to show the request and send nothing.")] bool dryRun = false,
+        [Description("Optional unique key, e.g. a UUID. Sending the same key and request again creates nothing new and returns the first result, so a retry cannot duplicate.")] string? idempotencyKey = null,
         CancellationToken cancellationToken = default) =>
-        ToolErrors.RunAsync(() => writer.CreateAsync(Entities, entity, data, dryRun, cancellationToken));
+        ToolErrors.RunAsync(() => writer.CreateAsync(Entities, entity, data, dryRun, cancellationToken, idempotencyKey));
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_list_item", ReadOnly = false, Destructive = true)]

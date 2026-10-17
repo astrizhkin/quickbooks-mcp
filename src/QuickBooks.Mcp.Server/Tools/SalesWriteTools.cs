@@ -9,7 +9,8 @@ namespace QuickBooks.Mcp.Server.Tools;
 [McpServerToolType]
 public sealed class SalesWriteTools(RecordWriter writer)
 {
-    private static readonly string[] Entities = ["Invoice", "SalesReceipt", "CreditMemo", "Estimate", "SalesOrder", "ReceivePayment", "ARRefundCreditCard", "Charge", "Deposit"];
+    /// <summary>The entities these tools accept.</summary>
+    public static readonly string[] Entities = ["Invoice", "SalesReceipt", "CreditMemo", "Estimate", "SalesOrder", "ReceivePayment", "ARRefundCreditCard", "Charge", "Deposit"];
 
     /// <summary>Creates a record.</summary>
     [McpServerTool(Name = "create_sales_transaction", ReadOnly = false, Destructive = false)]
@@ -18,8 +19,9 @@ public sealed class SalesWriteTools(RecordWriter writer)
         [Description("One of: Invoice,SalesReceipt,CreditMemo,Estimate,SalesOrder,ReceivePayment,ARRefundCreditCard,Charge,Deposit.")] string entity,
         [Description("Fields by qbXML element name, e.g. {\"Name\":\"Acme\",\"BillAddress\":{\"Addr1\":\"1 Main St\"}}. References are {\"FullName\":\"...\"} or {\"ListID\":\"...\"}; repeated elements (lines) are arrays.")] JsonElement data,
         [Description("true to show the request and send nothing.")] bool dryRun = false,
+        [Description("Optional unique key, e.g. a UUID. Sending the same key and request again creates nothing new and returns the first result, so a retry cannot duplicate.")] string? idempotencyKey = null,
         CancellationToken cancellationToken = default) =>
-        ToolErrors.RunAsync(() => writer.CreateAsync(Entities, entity, data, dryRun, cancellationToken));
+        ToolErrors.RunAsync(() => writer.CreateAsync(Entities, entity, data, dryRun, cancellationToken, idempotencyKey));
 
     /// <summary>Updates a record.</summary>
     [McpServerTool(Name = "update_sales_transaction", ReadOnly = false, Destructive = true)]
