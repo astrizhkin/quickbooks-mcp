@@ -1,0 +1,29 @@
+{
+  "name": "@devwithmj/quickbooks-mcp",
+  "version": "0.1.0",
+  "mcpName": "io.github.devwithmj/quickbooks-mcp",
+  "description": "MCP server for QuickBooks Desktop (Windows). Launcher that downloads and runs the verified release build.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devwithmj/quickbooks-mcp.git",
+    "directory": "packaging/npm"
+  },
+  "homepage": "https://github.com/devwithmj/quickbooks-mcp#readme",
+  "bugs": "https://github.com/devwithmj/quickbooks-mcp/issues",
+  "keywords": ["mcp", "model-context-protocol", "quickbooks", "quickbooks-desktop", "accounting"],
+  "bin": {
+    "quickbooks-mcp": "bin/quickbooks-mcp.js"
+  },
+  "files": ["bin", "lib.js", "checksums.json", "README.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

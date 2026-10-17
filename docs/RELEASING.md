@@ -24,3 +24,9 @@ also carries a build-provenance attestation (`gh attestation verify <file> --rep
 ## Code signing
 The executables are not signed yet because no certificate is available. Until they are, Windows SmartScreen may warn on first run;
 verify the checksum and attestation instead. When a certificate exists, sign in the workflow after publish and before the checksum step.
+
+## npm launcher
+After the release exists, the `npm` job in the same workflow publishes `packaging/npm` as `@devwithmj/quickbooks-mcp`, with the release's
+SHA-256 values written into `checksums.json` and npm provenance enabled. The launcher downloads the executable for its own version from the
+GitHub release, refuses it unless it matches that checksum, caches it under `%LOCALAPPDATA%\quickbooks-mcp`, and runs it. It needs an
+`NPM_TOKEN` repository secret. For development, `QB_MCP_EXE` points the launcher at a local build.

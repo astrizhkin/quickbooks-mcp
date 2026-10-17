@@ -52,3 +52,27 @@ jobs:
           cd dist
           cat *.sha256 > SHA256SUMS.txt
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes quickbooks-mcp-*.exe SHA256SUMS.txt
+
+  npm:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Publish the launcher with the release checksums
+        working-directory: packaging/npm
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          gh release download "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --pattern SHA256SUMS.txt
+          node scripts/write-checksums.js SHA256SUMS.txt checksums.json
+          npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
+          npm test
+          npm publish --provenance --access public
