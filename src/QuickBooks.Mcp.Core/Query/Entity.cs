@@ -23,7 +23,7 @@ public sealed record Entity(string Name, bool IsTransaction)
             "ARRefundCreditCard", "Bill", "BillPaymentCheck", "BillPaymentCreditCard", "BuildAssembly", "Charge", "Check",
             "CreditCardCharge", "CreditCardCredit", "CreditMemo", "Deposit", "Estimate", "InventoryAdjustment",
             "Invoice", "ItemReceipt", "JournalEntry", "PurchaseOrder", "ReceivePayment", "SalesOrder", "SalesReceipt",
-            "SalesTaxPaymentCheck", "TimeTracking", "Transfer", "TransferInventory", "VendorCredit",
+            "SalesTaxPaymentCheck", "TimeTracking", "Transaction", "Transfer", "TransferInventory", "VendorCredit",
         }.Select(n => new Entity(n, true)),
     ];
 

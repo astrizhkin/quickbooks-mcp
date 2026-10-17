@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <BillQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <BillRet>
+      <TxnID>2B-1000000001</TxnID>
+      <TxnDate>2025-02-01</TxnDate>
+      <RefNumber>2002</RefNumber>
+    </BillRet>
+  </BillQueryRs>
+</QBXMLMsgsRs></QBXML>
