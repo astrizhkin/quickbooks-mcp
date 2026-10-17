@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\QuickBooks.Mcp.Server\QuickBooks.Mcp.Server.csproj" />
+    <ProjectReference Include="..\QuickBooks.Mcp.TestSupport\QuickBooks.Mcp.TestSupport.csproj" />
   </ItemGroup>
 </Project>
