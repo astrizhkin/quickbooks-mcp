@@ -47,11 +47,19 @@ public sealed record ReportKind(string Request, string TypeElement, IReadOnlyLis
         new("CustomDetailReportQueryRq", "CustomDetailReportType", ["CustomTxnDetail"]),
     ];
 
+    /// <summary>Payroll reports, kept apart from <see cref="All"/> because payroll has its own opt-in.</summary>
+    public static readonly IReadOnlyList<ReportKind> Payroll =
+    [
+        new("PayrollSummaryReportQueryRq", "PayrollSummaryReportType", ["EmployeeEarningsSummary", "PayrollLiabilityBalances", "PayrollSummary"]),
+        new("PayrollDetailReportQueryRq", "PayrollDetailReportType",
+            ["EmployeeStateTaxesDetail", "PayrollItemDetail", "PayrollReviewDetail", "PayrollTransactionDetail", "PayrollTransactionsByPayee"]),
+    ];
+
     /// <summary>Finds a report type by name (ignoring case, spaces, underscores and '&amp;') and its family.</summary>
-    public static (ReportKind Kind, string Type)? Find(string name)
+    public static (ReportKind Kind, string Type)? Find(string name, IReadOnlyList<ReportKind>? kinds = null)
     {
         var wanted = Normalize(name);
-        foreach (var kind in All)
+        foreach (var kind in kinds ?? All)
         {
             var type = kind.Types.FirstOrDefault(t => Normalize(t) == wanted);
             if (type is not null) return (kind, type);

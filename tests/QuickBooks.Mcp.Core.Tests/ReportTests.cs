@@ -76,7 +76,7 @@ public class ReportDocsTests
         while (!File.Exists(Path.Combine(dir, "docs", "REPORTS.md"))) dir = Path.GetDirectoryName(dir)!;
         var docs = File.ReadAllText(Path.Combine(dir, "docs", "REPORTS.md"));
 
-        var missing = ReportKind.All.SelectMany(k => k.Types).Where(t => !docs.Contains(t, StringComparison.Ordinal));
+        var missing = ReportKind.All.Concat(ReportKind.Payroll).SelectMany(k => k.Types).Where(t => !docs.Contains(t, StringComparison.Ordinal));
 
         Assert.Empty(missing);
     }

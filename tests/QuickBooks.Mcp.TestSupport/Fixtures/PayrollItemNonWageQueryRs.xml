@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<QBXML><QBXMLMsgsRs>
+  <PayrollItemNonWageQueryRs requestID="1" statusCode="0" statusSeverity="Info" statusMessage="Status OK">
+    <PayrollItemNonWageRet><ListID>80000001-6000000001</ListID><Name>Example PayrollItemNonWage</Name><IsActive>true</IsActive></PayrollItemNonWageRet>
+  </PayrollItemNonWageQueryRs>
+</QBXMLMsgsRs></QBXML>

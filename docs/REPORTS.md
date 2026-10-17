@@ -42,4 +42,10 @@ CustomSummary (use `summarizeColumnsBy` and `summarizeRowsBy`), CustomTxnDetail 
 
 Each report family accepts only some options (for example detail reports have no `summarizeColumnsBy`, aging reports no `basis`); an unsupported option is refused with a message naming it.
 
-Not available: a cash-flow statement (QuickBooks' SDK has no such report type) and payroll reports (see the payroll tools).
+Not available: a cash-flow statement (the QuickBooks SDK has no such report type).
+
+## Payroll (separate opt-in)
+Payroll reports are not part of `get_report`. With `--allow-payroll` (`QB_ALLOW_PAYROLL=true`) the `get_payroll_report` tool is registered:
+PayrollSummary, EmployeeEarningsSummary, PayrollLiabilityBalances, PayrollItemDetail, PayrollTransactionDetail, PayrollTransactionsByPayee,
+PayrollReviewDetail, EmployeeStateTaxesDetail. Without it, employee payroll details are also masked in every result, and `search_payroll_items`
+and the payroll items in `query_records` are unavailable. This switch is independent of `QB_REDACT`, which covers tax IDs and bank and card numbers.

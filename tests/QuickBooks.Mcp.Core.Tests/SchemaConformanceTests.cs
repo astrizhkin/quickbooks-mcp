@@ -78,7 +78,7 @@ public class ReportSchemaConformanceTests
     public void Every_report_accepts_a_period_and_basis()
     {
         var bad = new List<string>();
-        foreach (var kind in ReportKind.All)
+        foreach (var kind in ReportKind.All.Concat(ReportKind.Payroll))
             foreach (var type in kind.Types)
             {
                 var options = kind.Request switch
@@ -89,6 +89,8 @@ public class ReportSchemaConformanceTests
                     "JobReportQueryRq" => new ReportOptions { DateMacro = "ThisYear", SummarizeColumnsBy = "Month", Entities = ["Acme"] },
                     "TimeReportQueryRq" => new ReportOptions { DateMacro = "ThisYear", SummarizeColumnsBy = "Month", Entities = ["Pat"], IncludeColumns = ["Amount"] },
                     "BudgetSummaryReportQueryRq" => new ReportOptions { FiscalYear = 2025, BudgetCriterion = "Accounts", DateMacro = "ThisYear", Classes = ["East"], SummarizeColumnsBy = "Class", SummarizeRowsBy = "Account" },
+                    "PayrollSummaryReportQueryRq" => new ReportOptions { DateMacro = "ThisYear", SummarizeColumnsBy = "Month", Entities = ["Pat"] },
+                    "PayrollDetailReportQueryRq" => new ReportOptions { DateMacro = "ThisYear", SummarizeRowsBy = "Employee", IncludeColumns = ["Amount"], Entities = ["Pat"] },
                     "CustomSummaryReportQueryRq" => new ReportOptions { DateMacro = "ThisYear", SummarizeColumnsBy = "Month", SummarizeRowsBy = "Account", Basis = "Accrual" },
                     _ => new ReportOptions { DateMacro = "ThisYear", SummarizeRowsBy = "Account", IncludeColumns = ["Amount"], Basis = "Accrual" },
                 };

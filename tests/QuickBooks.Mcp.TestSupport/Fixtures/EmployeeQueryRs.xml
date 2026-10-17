@@ -5,6 +5,7 @@
       <ListID>80000001-2000000001</ListID>
       <Name>Example Employee</Name>
       <IsActive>true</IsActive>
+      <EmployeePayrollInfo><PayPeriod>Weekly</PayPeriod></EmployeePayrollInfo>
     </EmployeeRet>
   </EmployeeQueryRs>
 </QBXMLMsgsRs></QBXML>

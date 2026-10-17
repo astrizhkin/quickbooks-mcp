@@ -26,7 +26,7 @@ builder.Logging.SetMinimumLevel(Enum.Parse<LogLevel>(config.LogLevel));
 builder.Logging.AddConsole(o => o.LogToStandardErrorThreshold = LogLevel.Trace);
 builder.Services.AddSingleton(config);
 IQbClient qb = new LockingQbClient(new ComQbClient(config.Qb), config.Qb);
-builder.Services.AddSingleton(config.Redact ? new RedactingQbClient(qb) : qb);
+builder.Services.AddSingleton(config.Redact || !config.AllowPayroll ? new RedactingQbClient(qb, sensitive: config.Redact, payroll: !config.AllowPayroll) : qb);
 builder.Services.AddQuickBooksMcp(config).WithStdioServerTransport();
 
 await builder.Build().RunAsync();

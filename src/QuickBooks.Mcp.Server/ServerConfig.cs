@@ -17,7 +17,7 @@ public sealed class ConfigException(string message) : Exception(message);
 public sealed class ServerConfig
 {
     private static readonly string[] Keys =
-        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL"];
+        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL"];
 
     /// <summary>Connection settings passed to the QuickBooks client.</summary>
     public required QbOptions Qb { get; init; }
@@ -27,6 +27,9 @@ public sealed class ServerConfig
 
     /// <summary>Entities writes are limited to (QB_WRITE_ALLOW=Invoice,Customer); null means any.</summary>
     public IReadOnlyList<string>? WriteAllow { get; init; }
+
+    /// <summary>Whether payroll data and the payroll tools are available. Off by default, separately from REDACT.</summary>
+    public bool AllowPayroll { get; init; }
 
     /// <summary>Where writes are recorded (JSON lines, no record data).</summary>
     public string AuditLogPath { get; init; } = QuickBooks.Mcp.Server.Writes.AuditLog.DefaultPath;
@@ -69,6 +72,7 @@ public sealed class ServerConfig
                 ? allow.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 : null,
             Redact = ParseBool(values, "REDACT", fallback: true),
+            AllowPayroll = ParseBool(values, "ALLOW_PAYROLL", fallback: false),
             AuditLogPath = values.GetValueOrDefault("AUDIT_LOG") ?? QuickBooks.Mcp.Server.Writes.AuditLog.DefaultPath,
             LogLevel = values.TryGetValue("LOG_LEVEL", out var level)
                 ? ParseEnum<LogLevelName>("LOG_LEVEL", level).ToString()

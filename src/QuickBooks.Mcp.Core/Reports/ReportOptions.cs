@@ -75,6 +75,8 @@ public sealed class ReportOptions
             "JobReportQueryRq" => (true, true, true, false, false, false, false),
             "TimeReportQueryRq" => (false, false, true, false, true, false, false),
             "BudgetSummaryReportQueryRq" => (false, false, true, true, false, false, false),
+            "PayrollSummaryReportQueryRq" => (true, true, true, false, false, false, false),
+            "PayrollDetailReportQueryRq" => (true, true, false, true, true, false, false),
             "CustomSummaryReportQueryRq" => (true, true, true, true, false, true, false),
             _ => (true, true, false, true, true, true, false), // CustomDetailReportQueryRq
         };

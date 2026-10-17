@@ -26,6 +26,8 @@ public static class McpSetup
             o.ServerInstructions = Instructions;
         }).WithTools<CompanyTools>().WithTools<QueryTools>().WithTools<SetupTools>().WithTools<NameTools>().WithTools<ItemTools>().WithTools<SalesTools>().WithTools<PurchaseTools>().WithTools<ReportTools>().WithTools<InventoryTools>().WithTools<ActivityTools>().WithResources<ListResources>().WithPrompts<WorkflowPrompts>();
 
+        if (config.AllowPayroll) builder.WithTools<PayrollTools>();
+
         var gate = WriteGate.From(config);
         services.AddSingleton(gate);
         services.AddSingleton(new AuditLog(config.AuditLogPath));

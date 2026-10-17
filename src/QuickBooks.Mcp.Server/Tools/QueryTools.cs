@@ -8,7 +8,7 @@ namespace QuickBooks.Mcp.Server.Tools;
 
 /// <summary>The generic query tool.</summary>
 [McpServerToolType]
-public sealed class QueryTools(IQbClient qb)
+public sealed class QueryTools(IQbClient qb, ServerConfig? config = null)
 {
     /// <summary>Queries any supported entity.</summary>
     [McpServerTool(Name = "query_records", ReadOnly = true)]
@@ -36,6 +36,8 @@ public sealed class QueryTools(IQbClient qb)
         {
             var found = Entity.Find(entity)
                 ?? throw new McpException($"Unknown entity '{entity}'. Use one of: {string.Join(", ", Entity.All.Select(e => e.Name))}.");
+            if (found.Name.StartsWith("PayrollItem", StringComparison.Ordinal) && config?.AllowPayroll != true)
+                throw new McpException("Payroll data is switched off. Start the server with --allow-payroll (QB_ALLOW_PAYROLL=true) to use it.");
             var filters = new QueryFilters
             {
                 Ids = ids,
