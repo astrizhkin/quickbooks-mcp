@@ -28,6 +28,8 @@ public static class McpSetup
 
         var gate = WriteGate.From(config);
         services.AddSingleton(gate);
+        services.AddSingleton(new AuditLog(config.AuditLogPath));
+        services.AddSingleton<WriteExecutor>();
 
         // Write tool classes go here, e.g. builder.AddWriteTools(gate, typeof(InvoiceWriteTools)).
         return builder;
