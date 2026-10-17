@@ -81,7 +81,7 @@ public sealed class CustomFieldWriteTools(WriteExecutor executor)
         ToolErrors.RunAsync(() =>
         {
             var (kind, owner) = Target(recordType, id, field);
-            return executor.ExecuteAsync(new WriteCall(WriteOp.Delete, kind, "DataExtDelRq", [.. owner()]), false, confirmationToken, cancellationToken);
+            return executor.ExecuteAsync(new WriteCall(WriteOp.Delete, kind, "DataExtDelRq", [new XElement("DataExtDel", owner())]), false, confirmationToken, cancellationToken);
         });
 
     // DataExt addresses a record by list type + ListObjRef, or by transaction type + TxnID, in this order.
