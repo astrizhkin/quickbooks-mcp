@@ -67,6 +67,17 @@ claude mcp add quickbooks -e QB_COMPANY_FILE="C:\Books\Company.qbw" -- npx -y @d
 
 **Cursor** (`.cursor/mcp.json` or `~/.cursor/mcp.json`): same shape as Claude Desktop.
 
+**ChatGPT desktop app and Codex** (Windows). The desktop app, the Codex command line and its editor extension share one list of local servers. In the desktop app, open Settings > MCP servers > Add server, choose STDIO and enter the path of the `.exe`; add `QB_COMPANY_FILE` as an environment variable. Or edit `%USERPROFILE%\.codex\config.toml`:
+
+```toml
+[mcp_servers.quickbooks]
+command = 'C:\Tools\quickbooks-mcp.exe'
+args = []
+env = { QB_COMPANY_FILE = 'C:\Books\Company.qbw' }
+```
+
+Or from a terminal: `codex mcp add quickbooks --env QB_COMPANY_FILE="C:\Books\Company.qbw" -- C:\Tools\quickbooks-mcp.exe`. Add `"--allow-writes"` to `args` only if you want changes. The ChatGPT website cannot run local servers; see [REMOTE-ACCESS.md](REMOTE-ACCESS.md) for a private link.
+
 **Anything else:** the command is `npx -y @devwithmj/quickbooks-mcp` (or the `.exe` path), speaking MCP over stdio. To use the downloaded exe directly, set `"command"` to its path and drop `args`.
 
 ## 4. Try it
