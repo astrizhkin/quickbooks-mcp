@@ -1,7 +1,7 @@
 {
   "name": "quickbooks-desktop",
   "displayName": "QuickBooks Desktop",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Ask questions about your QuickBooks Desktop company file and, if you allow it, make safe changes. Windows only.",
   "author": {
     "name": "devwithmj",

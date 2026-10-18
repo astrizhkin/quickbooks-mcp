@@ -1,10 +1,10 @@
 {
   "name": "quickbooks-desktop-plugin",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "description": "Installs the QuickBooks MCP server for the plugin.",
   "license": "MIT",
   "dependencies": {
-    "@devwithmj/quickbooks-mcp": "0.1.5"
+    "@devwithmj/quickbooks-mcp": "0.1.6"
   }
 }
