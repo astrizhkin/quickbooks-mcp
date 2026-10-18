@@ -16,6 +16,7 @@ Open-source [MCP](https://modelcontextprotocol.io) server that connects **QuickB
 | | |
 |---|---|
 | Claude Desktop | open the `.mcpb` from the [latest release](https://github.com/devwithmj/quickbooks-mcp/releases) |
+| Claude Code | `/plugin marketplace add devwithmj/quickbooks-mcp`, then `/plugin install quickbooks-desktop@quickbooks-mcp` |
 | npx | `npx -y @devwithmj/quickbooks-mcp` |
 | dnx | `dnx DevWithMJ.QuickBooks.Mcp --yes` |
 | exe | `quickbooks-mcp-win-x64.exe` (or `-win-x86`) from the release |

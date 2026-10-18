@@ -1,0 +1,15 @@
+{
+  "name": "quickbooks-mcp",
+  "description": "QuickBooks Desktop for Claude Code and Cowork",
+  "owner": {
+    "name": "devwithmj",
+    "url": "https://github.com/devwithmj"
+  },
+  "plugins": [
+    {
+      "name": "quickbooks-desktop",
+      "source": "./packaging/claude-plugin",
+      "description": "Ask questions about your QuickBooks Desktop company file and, if you allow it, make safe changes. Windows only."
+    }
+  ]
+}
