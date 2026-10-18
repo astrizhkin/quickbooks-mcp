@@ -5,7 +5,7 @@
 ## Feature complete per milestones
 - [x] Foundation, connectivity, read-only tools, reports, safe writes, advanced entities (see [ROADMAP.md](ROADMAP.md)).
 - [x] Packaging pipelines written for npm, NuGet, `.mcpb`, GitHub release and the MCP Registry ([RELEASING.md](RELEASING.md)).
-- [ ] The release pipeline has run once end to end from a tag (needs the `NPM_TOKEN` and `NUGET_API_KEY` secrets and a first tag, for example `v0.1.0`).
+- [x] The release pipeline has run once end to end from a tag: `v0.1.4` published the GitHub release, NuGet, npm, the `.mcpb` bundles, the SBOM and the MCP Registry entry.
 - [ ] Submissions to directories ([DIRECTORIES.md](DIRECTORIES.md), #45).
 
 ## Security review done
@@ -20,7 +20,7 @@
 - [ ] Authorization screenshots and the demo video (need a QuickBooks install, #47 and #67).
 
 ## Compatibility table published
-- [ ] [COMPATIBILITY.md](COMPATIBILITY.md) filled in from real runs across editions and years, single-user and multi-user, QuickBooks open and closed (#51). Everything is *untested* until this is done, and this is the main thing standing between the current state and 1.0.
+- [ ] [COMPATIBILITY.md](COMPATIBILITY.md) filled in from real runs across editions and years, single-user and multi-user, QuickBooks open and closed (#51). Every tool, read and write, has now been run against one real install (QuickBooks Enterprise 24.0, a sample company file, single-user and multi-user), including the requests that edition refuses by design. Other editions and years are still untested, and this is the main thing standing between the current state and 1.0.
 - [ ] Timings on a large real company file ([PERFORMANCE.md](PERFORMANCE.md), #61).
 
 ## License review done
