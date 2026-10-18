@@ -161,9 +161,15 @@ jobs:
         run: |
           curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
       - name: Publish to the MCP Registry
+        # npm and NuGet need a few minutes before the registry can see the new version, so retry.
         run: |
-          ./mcp-publisher login github-oidc
-          ./mcp-publisher publish
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            ./mcp-publisher login github-oidc
+            ./mcp-publisher publish && exit 0
+            echo "Attempt $attempt failed; waiting for the new version to appear."
+            sleep 60
+          done
+          exit 1
 
   sbom:
     needs: release
