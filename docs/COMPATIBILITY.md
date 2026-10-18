@@ -1,6 +1,6 @@
 # Compatibility
 
-This server has been built and tested against recorded responses and Intuit's qbXML 17.0 schema. **It has not yet been run against a real QuickBooks Desktop**, so every cell below starts as *untested*. Results are filled in by running the checks in the next section and sending a pull request.
+This server has been built and tested against recorded responses and Intuit's qbXML 17.0 schema, and run against **one real QuickBooks Desktop: Enterprise Accountant 24.0** with Intuit's sample company file. Every other cell below is *untested*. Results are filled in by following the [tester guide](TESTER-GUIDE.md) (or the longer steps in the next section) and sending a pull request or a compatibility report.
 
 ## How to test a combination
 
@@ -28,7 +28,7 @@ Legend: **pass**, **partial** (say what failed), **fail**, *untested*.
 | Enterprise | 22 | | | *untested* | *untested* | *untested* | |
 | Enterprise | 23 | | | *untested* | *untested* | *untested* | |
 | Enterprise | 24 | | | *untested* | *untested* | *untested* | |
-| Accountant editions | any | | | *untested* | *untested* | *untested* | |
+| Enterprise Accountant | 24.0 | 17.0 | 64-bit | pass | pass | partial | Sample company file, Windows 11. Every read tool ran in multi-user mode; the 14 requests QuickBooks refuses on this edition (leads, sales tax returns, payroll period, multi-currency, inventory sites, bar codes) are expected refusals. Merging records needs single-user mode (multi-user returns 3500). With QuickBooks closed, `--doctor` connected and was authorized; the full suite was not run closed. |
 
 Older years and newer ones follow the same procedure. Add rows rather than assuming.
 
