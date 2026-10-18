@@ -167,11 +167,15 @@ public sealed class ConfirmationAndProgressTests : IDisposable
 
     private sealed class ReportingClient : IQbClient
     {
-        public Task<string> SendAsync(Func<string, string> buildRequest, CancellationToken cancellationToken = default)
+        public async Task<string> SendAsync(Func<string, string> buildRequest, CancellationToken cancellationToken = default)
         {
             QbProgress.Report("Opening the QuickBooks connection");
             QbProgress.Report("Talking to QuickBooks");
-            return Task.FromResult("""<QBXML><QBXMLMsgsRs><CompanyQueryRs statusCode="0"><CompanyRet><CompanyName>X</CompanyName></CompanyRet></CompanyQueryRs></QBXMLMsgsRs></QBXML>""");
+
+            // Real QuickBooks takes a while to answer. The client drops progress for a call once its result arrives,
+            // so an instant reply would make this test race the notifications.
+            await Task.Delay(500, cancellationToken);
+            return """<QBXML><QBXMLMsgsRs><CompanyQueryRs statusCode="0"><CompanyRet><CompanyName>X</CompanyName></CompanyRet></CompanyQueryRs></QBXMLMsgsRs></QBXML>""";
         }
     }
 
