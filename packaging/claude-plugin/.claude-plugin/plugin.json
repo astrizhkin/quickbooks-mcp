@@ -1,7 +1,7 @@
 {
   "name": "quickbooks-desktop",
   "displayName": "QuickBooks Desktop",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Ask questions about your QuickBooks Desktop company file and, if you allow it, make safe changes. Windows only.",
   "author": {
     "name": "devwithmj",
@@ -10,7 +10,13 @@
   "homepage": "https://github.com/devwithmj/quickbooks-mcp",
   "repository": "https://github.com/devwithmj/quickbooks-mcp",
   "license": "MIT",
-  "keywords": ["quickbooks", "accounting", "bookkeeping", "finance", "windows"],
+  "keywords": [
+    "quickbooks",
+    "accounting",
+    "bookkeeping",
+    "finance",
+    "windows"
+  ],
   "icon": "./icon.svg",
   "documentationUrl": "https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/GUIDE.md",
   "supportUrl": "https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/SUPPORT.md",
