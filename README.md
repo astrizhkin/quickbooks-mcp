@@ -2,7 +2,9 @@
 
 Open-source [MCP](https://modelcontextprotocol.io) server that connects **QuickBooks Desktop** (Pro, Premier, Enterprise) to LLMs and agents.
 
-> Status: pre-1.0. Built and tested against recorded responses and the qbXML schema; not yet validated across QuickBooks versions (see [COMPATIBILITY.md](docs/COMPATIBILITY.md)).
+[![npm](https://img.shields.io/npm/v/@devwithmj/quickbooks-mcp?label=npm)](https://www.npmjs.com/package/@devwithmj/quickbooks-mcp) [![NuGet](https://img.shields.io/nuget/v/DevWithMJ.QuickBooks.Mcp?label=NuGet)](https://www.nuget.org/packages/DevWithMJ.QuickBooks.Mcp) [![Release](https://img.shields.io/github/v/release/devwithmj/quickbooks-mcp)](https://github.com/devwithmj/quickbooks-mcp/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+> Status: pre-1.0. Run so far against QuickBooks Desktop Enterprise Accountant 24.0 with Intuit's sample company file; other editions and years are not yet tested (see [COMPATIBILITY.md](docs/COMPATIBILITY.md), and the [tester guide](docs/TESTER-GUIDE.md) if you can help).
 
 ## What you get
 
@@ -22,6 +24,22 @@ Open-source [MCP](https://modelcontextprotocol.io) server that connects **QuickB
 | exe | `quickbooks-mcp-win-x64.exe` (or `-win-x86`) from the release |
 
 Then allow access once in QuickBooks (`--authorize`) and add the server to your AI app. Step by step: **[docs/GUIDE.md](docs/GUIDE.md)**.
+
+Packages and listings: [npm](https://www.npmjs.com/package/@devwithmj/quickbooks-mcp), [NuGet](https://www.nuget.org/packages/DevWithMJ.QuickBooks.Mcp), [GitHub releases](https://github.com/devwithmj/quickbooks-mcp/releases), the official MCP Registry (`io.github.devwithmj/quickbooks-mcp`) and [Glama](https://glama.ai/mcp/servers/devwithmj/quickbooks-mcp).
+
+## Turn on changes
+
+Everything is read-only until you opt in. Add the flag to the arguments your MCP client starts the server with:
+
+```json
+"args": ["-y", "@devwithmj/quickbooks-mcp", "--allow-writes"]
+```
+
+or set an environment variable: `QB_ALLOW_WRITES=true` for everything, or `QB_ENABLE_WRITE`, `QB_ENABLE_UPDATE` and `QB_ENABLE_DELETE` for one kind each (`QB_WRITE_ALLOW=Invoice,Customer` limits which record types can change). Deletes and voids always need a confirmation step. Details: [docs/WRITES.md](docs/WRITES.md).
+
+## Use it over HTTP (advanced)
+
+Most clients start the server themselves. For a client that cannot, `quickbooks-mcp --http` serves MCP over HTTP on `127.0.0.1:8765` only, and every request needs an access key (printed at start, or set `QB_HTTP_KEY`). Changes stay off unless you also pass `--http-allow-writes`. To reach it from another device, put your own tunnel in front of it: [docs/REMOTE-ACCESS.md](docs/REMOTE-ACCESS.md).
 
 ## QuickBooks Online or Desktop?
 
