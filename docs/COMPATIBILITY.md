@@ -30,6 +30,14 @@ Legend: **pass**, **partial** (say what failed), **fail**, *untested*.
 | Enterprise | 24 | | | *untested* | *untested* | *untested* | |
 | Enterprise Accountant | 24.0 | 17.0 | 64-bit | pass | pass | partial | Sample company file, Windows 11. Every read tool ran in multi-user mode; the 14 requests QuickBooks refuses on this edition (leads, sales tax returns, payroll period, multi-currency, inventory sites, bar codes) are expected refusals. Merging records needs single-user mode (multi-user returns 3500). With QuickBooks closed, `--doctor` connected and was authorized; the full suite was not run closed. |
 
+## Company options
+
+Some results depend on how the company file is set up, not on the edition. These are tracked separately.
+
+| Option | Status | Notes |
+|---|---|---|
+| Multi-currency | *untested live* | The server returns the home currency and a plain note whenever a result holds foreign-currency records, and unit tests cover it. The one real file used so far does not have multi-currency on, so QuickBooks refuses currency requests there (code 3250). To test it, follow the multi-currency section of the [tester guide](TESTER-GUIDE.md#multi-currency-test-optional) and send the result. |
+
 Older years and newer ones follow the same procedure. Add rows rather than assuming.
 
 ## What is known without a real QuickBooks
