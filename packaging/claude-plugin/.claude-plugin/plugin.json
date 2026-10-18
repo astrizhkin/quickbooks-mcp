@@ -13,7 +13,7 @@
   "keywords": ["quickbooks", "accounting", "bookkeeping", "finance", "windows"],
   "icon": "./icon.svg",
   "documentationUrl": "https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/GUIDE.md",
-  "supportUrl": "https://github.com/devwithmj/quickbooks-mcp/issues",
+  "supportUrl": "https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/SUPPORT.md",
   "privacyPolicyUrl": "https://github.com/devwithmj/quickbooks-mcp/blob/main/docs/PRIVACY.md",
   "userConfig": {
     "company_file": {
