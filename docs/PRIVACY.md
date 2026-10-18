@@ -3,7 +3,7 @@
 QuickBooks MCP is a local program. It reads and, only if you turn writes on, changes the QuickBooks Desktop company file on your own computer, and passes the results to the AI app that started it.
 
 ## Data collection
-The server collects nothing about you. It has no accounts, no analytics and no telemetry, and it opens no network connections of its own.
+The server collects nothing about you. It has no accounts, no analytics and no telemetry, and it opens no network connections of its own. The optional `--http` mode listens only on this computer, behind an access key you control; sending that address anywhere else is your choice (see [REMOTE-ACCESS.md](REMOTE-ACCESS.md)).
 
 ## Use and storage
 - Records and reports you ask for are returned to your AI app for that request only. The server keeps no copy.

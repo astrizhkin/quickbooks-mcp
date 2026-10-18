@@ -116,6 +116,7 @@ Everything is read-only until you opt in. In the same `env` (or as arguments):
 | `QB_CONFIRM_WRITES=true` | also ask you to approve every create and update (deletes and voids are always confirmed) |
 | `QB_ALLOW_PAYROLL=true` | allow payroll data and reports |
 | `QB_REDACT=false` | stop masking tax IDs and bank and card numbers (not recommended) |
+| `--http`, `--http-port`, `QB_HTTP_KEY` | serve MCP over HTTP on this computer, behind an access key, for a tunnel ([REMOTE-ACCESS.md](REMOTE-ACCESS.md)); changes also need `--http-allow-writes` |
 
 Changes support a preview (`dryRun`), deletes and voids need a confirmation step, and everything is logged to `%LOCALAPPDATA%\quickbooks-mcp\audit.jsonl`. Details: [WRITES.md](WRITES.md). Other settings: `QB_MODE` (`single`, `multi` or `any`), `QB_TIMEOUT_SECONDS`, `QB_MAX_RETRIES`, `QB_CACHE_SECONDS` (see [PERFORMANCE.md](PERFORMANCE.md)), `QB_LOG_LEVEL`, `QB_CONFIG` (a JSON file with the same names in lowercase). Command-line flags beat environment variables, which beat the file.
 

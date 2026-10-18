@@ -17,7 +17,7 @@ public sealed class ConfigException(string message) : Exception(message);
 public sealed class ServerConfig
 {
     private static readonly string[] Keys =
-        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL", "LOG_FILE", "CACHE_SECONDS", "CONFIRM_WRITES"];
+        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL", "LOG_FILE", "CACHE_SECONDS", "CONFIRM_WRITES", "HTTP", "HTTP_PORT", "HTTP_KEY", "HTTP_ALLOW_WRITES"];
 
     /// <summary>Connection settings passed to the QuickBooks client.</summary>
     public required QbOptions Qb { get; init; }
@@ -49,6 +49,15 @@ public sealed class ServerConfig
     /// <summary>Optional file to append log lines to, besides stderr. Logs hold no company data.</summary>
     public string? LogFile { get; init; }
 
+    /// <summary>Serve MCP over HTTP on this computer's loopback address instead of stdio. Every request needs the access key.</summary>
+    public bool Http { get; init; }
+
+    /// <summary>The loopback port for <see cref="Http"/>.</summary>
+    public int HttpPort { get; init; } = 8765;
+
+    /// <summary>The access key for <see cref="Http"/>; null means use (or create) the key file.</summary>
+    public string? HttpKey { get; init; }
+
     /// <summary>Loads and validates the settings.</summary>
     public static ServerConfig Load(string[] args, IDictionary environment)
     {
@@ -65,6 +74,13 @@ public sealed class ServerConfig
         }
 
         var defaults = new QbOptions();
+        var writes = ParseWrites(values);
+        var http = ParseBool(values, "HTTP", fallback: false);
+        if (http && writes != WriteOp.None && !ParseBool(values, "HTTP_ALLOW_WRITES", fallback: false))
+            throw new ConfigException("--http serves your books outside this program, so changes are refused unless you also pass --http-allow-writes.");
+        if (values.GetValueOrDefault("HTTP_KEY") is { Length: < 16 })
+            throw new ConfigException("HTTP_KEY must be at least 16 characters.");
+
         return new ServerConfig
         {
             Qb = new QbOptions
@@ -76,7 +92,10 @@ public sealed class ServerConfig
                 Timeout = TimeSpan.FromSeconds(ParseInt(values, "TIMEOUT_SECONDS", (int)defaults.Timeout.TotalSeconds, 1)),
                 MaxRetries = ParseInt(values, "MAX_RETRIES", defaults.MaxRetries, 0),
             },
-            Writes = ParseWrites(values),
+            Writes = writes,
+            Http = http,
+            HttpPort = ParseInt(values, "HTTP_PORT", 8765, 1),
+            HttpKey = values.GetValueOrDefault("HTTP_KEY"),
             WriteAllow = values.TryGetValue("WRITE_ALLOW", out var allow)
                 ? allow.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 : null,

@@ -20,6 +20,33 @@ public class ServerConfigTests
     }
 
     [Fact]
+    public void Http_is_off_by_default_and_uses_a_loopback_port()
+    {
+        var c = ServerConfig.Load([], Env());
+        var on = ServerConfig.Load(["--http", "--http-port", "9000"], Env());
+
+        Assert.False(c.Http);
+        Assert.Equal(8765, c.HttpPort);
+        Assert.True(on.Http);
+        Assert.Equal(9000, on.HttpPort);
+    }
+
+    [Fact]
+    public void Http_refuses_changes_unless_they_are_allowed_for_http_too()
+    {
+        Assert.Throws<ConfigException>(() => ServerConfig.Load(["--http", "--allow-writes"], Env()));
+        Assert.Equal(WriteOp.All, ServerConfig.Load(["--http", "--allow-writes", "--http-allow-writes"], Env()).Writes);
+        Assert.Equal(WriteOp.All, ServerConfig.Load(["--allow-writes"], Env()).Writes);
+    }
+
+    [Fact]
+    public void A_short_http_key_is_refused()
+    {
+        Assert.Throws<ConfigException>(() => ServerConfig.Load(["--http"], Env(("QB_HTTP_KEY", "short"))));
+        Assert.Equal("0123456789abcdef", ServerConfig.Load(["--http"], Env(("QB_HTTP_KEY", "0123456789abcdef"))).HttpKey);
+    }
+
+    [Fact]
     public void Cli_beats_env_beats_file()
     {
         var file = Path.GetTempFileName();

@@ -10,7 +10,7 @@ AI app (Claude, VS Code, ...)  <--stdio-->  quickbooks-mcp  <--local COM-->  Qui
         +--> the model provider (whatever that app uses)
 ```
 
-- The server talks to QuickBooks on your computer. It opens no network connections, has no telemetry, and writes only two local files: the audit log and the idempotency ledger (`%LOCALAPPDATA%\quickbooks-mcp`).
+- The server talks to QuickBooks on your computer. By default it opens no network connections (the optional `--http` mode listens on this computer only, behind an access key), has no telemetry, and writes only two local files: the audit log and the idempotency ledger (`%LOCALAPPDATA%\quickbooks-mcp`).
 - What leaves your computer is **whatever a tool returns to the AI app**. That output goes to the model provider the app uses, under that provider's terms. Treat anything a tool can return as shared with them.
 - The npx launcher downloads the release executable from GitHub once and verifies its SHA-256 against a value shipped inside the npm package. After that nothing is downloaded.
 - Logs go to stderr and contain no record data.
@@ -31,7 +31,7 @@ AI app (Claude, VS Code, ...)  <--stdio-->  quickbooks-mcp  <--local COM-->  Qui
 | Card data | never accepted for writing, masked on reading, no switch | none (see [the decision](design/credit-card-processing.md)) |
 | Result size | pages capped at about 100k characters with a cursor | none |
 | Input checking | unknown fields refused; requests are built by the server, never pasted as raw XML | none |
-| Local only | no network, no service, no remote mode in the server itself | see [the remote-use note](design/events-and-web-connector.md); a private tunnel you run yourself is described in [REMOTE-ACCESS.md](REMOTE-ACCESS.md) |
+| Local only | no network, no service by default; the optional `--http` mode listens on `127.0.0.1` only, needs an access key on every request and refuses changes unless `--http-allow-writes` is also given | see [the remote-use note](design/events-and-web-connector.md); a private tunnel you run yourself is described in [REMOTE-ACCESS.md](REMOTE-ACCESS.md) |
 
 QuickBooks itself still applies its own permissions: the server acts as the QuickBooks user you authorized, so it cannot do more than that user can.
 
@@ -47,7 +47,7 @@ QuickBooks itself still applies its own permissions: the server acts as the Quic
 
 **5. Another program using the authorization.** Once QuickBooks has been told to trust this app (`--authorize`), any program that presents the same application name can connect while the file is open or "allow even if QuickBooks is not running" was chosen. *Mitigation:* review and revoke it in QuickBooks under Preferences > Integrated Applications; QuickBooks shows it as "QuickBooks MCP".
 
-**6. Other local users.** The audit log and idempotency ledger live in the user's profile and contain record IDs, not data. The server runs with the user's own rights and exposes no network port.
+**6. Other local users.** The audit log and idempotency ledger live in the user's profile and contain record IDs, not data. The server runs with the user's own rights and exposes no network port unless `--http` is switched on, and then only on `127.0.0.1`.
 
 ## Injection review
 

@@ -1,10 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using QuickBooks.Mcp.Core.Session;
 using QuickBooks.Mcp.Server;
 using QuickBooks.Mcp.Server.Cli;
-using QuickBooks.Mcp.Server.Diagnostics;
+using QuickBooks.Mcp.Server.Http;
 
 ServerConfig config;
 try
@@ -27,20 +25,10 @@ if (args.Contains("--authorize")) return await SetupCommands.AuthorizeAsync(conf
 if (args.Contains("--diagnostics")) return await DiagnosticsCommand.RunAsync(config, Console.Out);
 if (args.Contains("--doctor")) return await SetupCommands.DoctorAsync(config.Qb, Console.Out);
 
+if (config.Http) return await HttpHost.RunAsync(config, args);
+
 var builder = Host.CreateApplicationBuilder(args);
-builder.Logging.ClearProviders();
-builder.Logging.SetMinimumLevel(Enum.Parse<LogLevel>(config.LogLevel));
-// stdout carries the protocol, so all logs go to stderr.
-builder.Logging.AddConsole(o => o.LogToStandardErrorThreshold = LogLevel.Trace);
-if (config.LogFile is not null) builder.Logging.AddProvider(new FileLoggerProvider(config.LogFile));
-builder.Services.AddSingleton(config);
-var locking = new LockingQbClient(new ComQbClient(config.Qb), config.Qb);
-builder.Services.AddSingleton<IQbClient>(sp =>
-{
-    IQbClient qb = new LoggingQbClient(locking, sp.GetRequiredService<ILoggerFactory>().CreateLogger<LoggingQbClient>());
-    qb = new CachingQbClient(qb, config.CacheLifetime);
-    return config.Redact || !config.AllowPayroll ? new RedactingQbClient(qb, sensitive: config.Redact, payroll: !config.AllowPayroll) : qb;
-});
+ServerHost.Configure(builder, config);
 builder.Services.AddQuickBooksMcp(config).WithStdioServerTransport();
 
 await builder.Build().RunAsync();

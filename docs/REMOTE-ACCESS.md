@@ -2,7 +2,7 @@
 
 The server runs on the computer that has QuickBooks and speaks MCP over stdio, so a client on the same computer needs nothing more than the setup in [GUIDE.md](GUIDE.md). This page is for people who want a client that runs elsewhere (a chat app in the browser, a phone, another machine) to reach **their own** books through a private link.
 
-There is no hosted service and none is planned. Each person runs a small tunnel on their own computer; the link is theirs, and the data never goes anywhere except to the client they connect.
+There is no hosted service and none is planned. Each person runs a tunnel on their own computer; the link is theirs, and the data never goes anywhere except to the client they connect.
 
 ## Read this first
 
@@ -33,22 +33,23 @@ tunnel-client run --profile quickbooks
 
 OpenAI limits a tunnel to 600 requests a minute and 120 seconds per request, which is plenty for this server.
 
-## Option 2: your own link with Cloudflare Tunnel (any client)
+## Option 2: the built-in HTTP mode with a Cloudflare tunnel (any client)
 
-Use this for clients that accept a remote MCP address. It needs a free Cloudflare account and a domain on Cloudflare. It has three parts: a bridge that turns stdio into HTTP, a tunnel, and a login in front of it.
+Use this for clients that accept a remote MCP address. The server can speak MCP over HTTP itself, so there is no bridge to install. It listens only on this computer (`127.0.0.1`), and every request must carry an access key.
 
-1. **Bridge.** [supergateway](https://github.com/supercorp-ai/supergateway) serves a stdio server over Streamable HTTP. Listen on the local loopback only, and require a key:
+1. **Start it.** The first run makes a random key and saves it next to the audit log; later runs reuse it.
 
 ```powershell
 $env:QB_COMPANY_FILE = "C:\Books\Company.qbw"
-npx -y supergateway --stdio "C:\Tools\quickbooks-mcp.exe" `
-  --outputTransport streamableHttp --port 8000 --host 127.0.0.1 `
-  --apiKey "a-long-random-secret"
+C:\Tools\quickbooks-mcp.exe --http
 ```
 
-2. **Tunnel.** Install `cloudflared` and create a named tunnel that points a hostname on your domain at `http://localhost:8000`, as described in [Cloudflare's tunnel setup](https://developers.cloudflare.com/tunnel/setup/). Run it as a Windows service if you want it to survive a restart. Do not use a throwaway quick tunnel for books: it has no login of its own.
-3. **Login in front.** Add a [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/secure-mcp-servers/) policy for the hostname so only you can get through. Clients that cannot sign in through a browser can use an Access service token (the `CF-Access-Client-Id` and `CF-Access-Client-Secret` headers).
-4. **Client.** Add the address `https://your-hostname/mcp` as a remote MCP server and send the key from step 1 as a bearer token (`Authorization: Bearer ...`) if the client has a field for it.
+   It prints the address (`http://127.0.0.1:8765/mcp`) and the key. Use `--http-port 9000` to change the port, or set `QB_HTTP_KEY` (at least 16 characters) to choose your own key. Changes are refused in this mode unless you also pass `--http-allow-writes`.
+2. **Tunnel.** The address above only works on this computer. To reach it from elsewhere, put a tunnel in front of it. The quickest way to try it is a Cloudflare quick tunnel, which needs no account: install `cloudflared` (`winget install Cloudflare.cloudflared`) and run `cloudflared tunnel --url http://127.0.0.1:8765`. It prints a random `https://...trycloudflare.com` address that changes every time you start it. For a permanent address on your own domain, create a named tunnel as described in [Cloudflare's tunnel setup](https://developers.cloudflare.com/tunnel/setup/) and run it as a Windows service.
+3. **Login in front (recommended for a permanent address).** The access key already stops anyone without it, but a [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/access-controls/ai-controls/secure-mcp-servers/) policy adds a second lock. Clients that cannot sign in through a browser can use an Access service token (the `CF-Access-Client-Id` and `CF-Access-Client-Secret` headers).
+4. **Client.** Add `https://<your-tunnel-address>/mcp` as a remote MCP server and send the key as a bearer token (`Authorization: Bearer <key>`) or as an `X-API-Key` header, whichever the client offers.
+
+Most people never need this. The ChatGPT and Claude desktop apps, Claude Code, editors and the Gemini command line start the server themselves, as described in the [guide](GUIDE.md).
 
 ## Checking it works
 
