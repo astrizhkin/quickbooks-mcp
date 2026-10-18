@@ -12,7 +12,7 @@ The server is read-only by default. Creating, changing, deleting and voiding rec
 
 ## What it runs
 
-The plugin starts one local program with `npx -y @devwithmj/quickbooks-mcp@0.1.4`, which downloads a checksummed Windows executable from the project's GitHub release. The program talks to the QuickBooks installed on your computer through its local SDK.
+The plugin installs `@devwithmj/quickbooks-mcp` 0.1.4 from the npm registry at the exact version pinned in `package-lock.json`, then starts it with `node`. On first start it downloads a checksummed Windows executable from the project's GitHub release. The program talks to the QuickBooks installed on your computer through its local SDK.
 
 ## Privacy Policy
 

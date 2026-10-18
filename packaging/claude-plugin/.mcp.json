@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "quickbooks": {
-      "command": "npx",
-      "args": ["-y", "@devwithmj/quickbooks-mcp@0.1.4"],
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/node_modules/@devwithmj/quickbooks-mcp/bin/quickbooks-mcp.js"],
       "env": { "QB_COMPANY_FILE": "${user_config.company_file}" }
     }
   }
