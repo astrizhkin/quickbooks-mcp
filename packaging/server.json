@@ -11,7 +11,7 @@
   "packages": [
     {
       "registryType": "nuget",
-      "registryBaseUrl": "https://api.nuget.org",
+      "registryBaseUrl": "https://api.nuget.org/v3/index.json",
       "identifier": "DevWithMJ.QuickBooks.Mcp",
       "version": "__VERSION__",
       "runtimeHint": "dnx",
