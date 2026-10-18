@@ -47,6 +47,9 @@ also carries a build-provenance attestation (`gh attestation verify <file> --rep
 The executables are not signed yet because no certificate is available. Until they are, Windows SmartScreen may warn on first run;
 verify the checksum and attestation instead. When a certificate exists, sign in the workflow after publish and before the checksum step.
 
+## Claude plugin
+The `plugin` job runs after npm. It pins `packaging/claude-plugin` (manifest version, `package.json` and `package-lock.json`) to the version just published and opens a pull request, because the directory reads the plugin from `main`. Merge that pull request after each release. The job needs the repository setting that lets Actions create pull requests (Settings > Actions > General), and it waits up to ten minutes for npm to list the new version.
+
 ## npm launcher
 After the release exists, the `npm` job in the same workflow publishes `packaging/npm` as `@devwithmj/quickbooks-mcp`, with the release's
 SHA-256 values written into `checksums.json` and npm provenance enabled. The launcher downloads the executable for its own version from the

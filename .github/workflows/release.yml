@@ -171,6 +171,44 @@ jobs:
           done
           exit 1
 
+  plugin:
+    needs: npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Open a pull request that pins the plugin to this release
+        # The directory reads the plugin from main, so main has to name the version that now exists on npm.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          cd packaging/claude-plugin
+          jq --arg v "$version" '.version = $v' .claude-plugin/plugin.json > plugin.tmp && mv plugin.tmp .claude-plugin/plugin.json
+          npm pkg set version="$version" "dependencies.@devwithmj/quickbooks-mcp=$version"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            npm install --package-lock-only --ignore-scripts && break
+            echo "Attempt $attempt failed; waiting for $version to appear on npm."
+            sleep 60
+          done
+          npm install --package-lock-only --ignore-scripts
+          cd ../..
+          branch="chore/plugin-$version"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add packaging/claude-plugin
+          git commit -m "chore(plugin): pin the plugin to $version"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "chore(plugin): pin the plugin to $version"             --body "Pins the plugin's package, lockfile and manifest to the published $version, so the directory installs the release it lists."
+
   sbom:
     needs: release
     runs-on: ubuntu-latest
