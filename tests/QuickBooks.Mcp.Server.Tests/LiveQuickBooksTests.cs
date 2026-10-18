@@ -126,11 +126,45 @@ public sealed class LiveQuickBooksTests
         ["search_transactions"] = [new { maxResults = 5, dateFrom = "2000-01-01" }],
     };
 
-    // Not called: open_in_quickbooks changes what is on screen, payroll needs its own opt-in,
-    // get_assemblies_can_build, get_bills_to_pay and describe_write_fields are covered below;
-    // get_event_subscriptions needs a subscriber GUID that only the registering application knows, and
-    // get_sales_tax_return_lines needs the name of a tax agency.
-    private static readonly HashSet<string> Skipped = ["open_in_quickbooks", "get_payroll_report", "search_payroll_items", "get_payroll_last_period", "get_assemblies_can_build", "get_bills_to_pay", "get_event_subscriptions", "get_sales_tax_return_lines", "describe_write_fields"];
+    // Calls that this QuickBooks (Enterprise 24.0, sample product-based company) refuses. Each must keep failing with
+    // exactly this code, so a call that starts working, or fails differently, is reported rather than ignored.
+    // 3231: refused whatever the qbXML version (checked by hand against the raw reply): Leads, sales tax returns, payroll period.
+    // 3250: the company file does not use the feature (multi-currency, advanced inventory with sites and bar codes).
+    private static readonly (string Call, string Code)[] Refused =
+    [
+        ("query_records {\"entity\":\"Lead\"", "3231"),
+        ("get_sales_tax_returns {}", "3231"),
+        ("get_sales_tax_return_lines ", "3231"),
+        ("get_payroll_last_period {}", "3231"),
+        ("search_setup_lists {\"list\":\"Currency\"}", "3250"),
+        ("query_records {\"entity\":\"Currency\"", "3250"),
+        ("query_records {\"entity\":\"InventorySite\"", "3250"),
+        ("query_records {\"entity\":\"TransferInventory\"", "3250"),
+        ("search_inventory_transactions {\"type\":\"TransferInventory\"", "3250"),
+        ("search_inventory_sites {}", "3250"),
+        ("get_barcodes {}", "3250"),
+        ("get_report {\"reportType\":\"InventoryValuationSummaryBySite\"", "3250"),
+        ("get_report {\"reportType\":\"LotNumberInStockBySite\"", "3250"),
+        ("get_report {\"reportType\":\"SerialNumberInStockBySite\"", "3250"),
+    ];
+
+    /// <summary>Null when the call did what was expected: worked, or failed with exactly the code listed in <see cref="Refused"/>.</summary>
+    private static string? Judge(string tool, object args, bool ok, string text)
+    {
+        var call = $"{tool} {JsonSerializer.Serialize(args)}";
+        var refused = Refused.FirstOrDefault(r => call.StartsWith(r.Call, StringComparison.Ordinal));
+        if (refused.Call is null) return ok ? null : $"{call} -> {Short(text)}";
+        return !ok && text.Contains($"(code {refused.Code})", StringComparison.Ordinal)
+            ? null
+            : $"{call} was expected to be refused with code {refused.Code} but gave: {Short(text)}";
+    }
+
+    // Not in the sweep because they need an argument or an opt-in; each has its own test below.
+    private static readonly HashSet<string> Skipped =
+    [
+        "open_in_quickbooks", "describe_write_fields", "get_assemblies_can_build", "get_bills_to_pay", "get_event_subscriptions",
+        "get_sales_tax_return_lines", "get_payroll_report", "search_payroll_items", "get_payroll_last_period",
+    ];
 
     [LiveFact]
     public async Task Every_read_only_tool_works()
@@ -162,8 +196,7 @@ public sealed class LiveQuickBooksTests
             {
                 total++;
                 var (ok, text) = await CallAsync(session.Client, tool.Name, args);
-                // 3250: the company file does not use that feature (multi-currency, multiple inventory sites), which is not a defect.
-                if (!ok && !text.Contains("(code 3250)", StringComparison.Ordinal)) failures.Add($"{tool.Name} {JsonSerializer.Serialize(args)} -> {Short(text)}");
+                if (Judge(tool.Name, args, ok, text) is { } failure) failures.Add(failure);
             }
         }
 
@@ -219,6 +252,86 @@ public sealed class LiveQuickBooksTests
         Assert.DoesNotContain("get_payroll_report", names);
     }
 
+    [LiveFact]
+    public async Task Sales_tax_return_lines_work_for_a_tax_agency()
+    {
+        await using var session = await StartAsync();
+        var (ok, text) = await CallAsync(session.Client, "search_items", new { itemType = "SalesTax", maxResults = 5 });
+        Assert.True(ok, text);
+        using var doc = JsonDocument.Parse(text);
+        var agency = doc.RootElement.GetProperty("records").EnumerateArray()
+            .Select(r => r.TryGetProperty("TaxVendorRef", out var v) && v.TryGetProperty("FullName", out var n) ? n.GetString() : null)
+            .FirstOrDefault(n => n is not null);
+        Assert.True(agency is not null, "the company file has no sales tax item with a tax agency to test with");
+
+        var args = new { taxAgencies = new[] { agency } };
+        var (done, result) = await CallAsync(session.Client, "get_sales_tax_return_lines", args);
+        Assert.Null(Judge("get_sales_tax_return_lines", args, done, result));
+    }
+
+    [LiveFact]
+    public async Task Event_subscriptions_can_be_queried_for_every_kind()
+    {
+        await using var session = await StartAsync();
+        var failures = new List<string>();
+        foreach (var kind in new[] { "DataEventSubscription", "UIEventSubscription", "UIExtensionSubscription", "DataEventRecoveryInfo" })
+        {
+            var (ok, text) = await CallAsync(session.Client, "get_event_subscriptions", new { kind, subscriberId = Guid.NewGuid().ToString() });
+            if (!ok) failures.Add($"{kind} -> {Short(text)}");
+        }
+
+        AssertNoFailures(failures, 4);
+    }
+
+    [LiveFact]
+    public async Task Payroll_tools_work_when_payroll_is_allowed()
+    {
+        await using var session = await StartAsync("--allow-payroll");
+        var failures = new List<string>();
+        var calls = new List<(string Tool, object Args)>
+        {
+            ("get_payroll_last_period", new { }),
+            ("search_payroll_items", new { type = "PayrollItemWage", maxResults = 5 }),
+            ("search_payroll_items", new { type = "PayrollItemNonWage", maxResults = 5 }),
+        };
+        calls.AddRange(ReportKind.Payroll.SelectMany(k => k.Types).Select(t => ("get_payroll_report", (object)new { reportType = t, dateMacro = "ThisYearToDate" })));
+        foreach (var (tool, args) in calls)
+        {
+            var (ok, text) = await CallAsync(session.Client, tool, args);
+            if (Judge(tool, args, ok, text) is { } failure) failures.Add(failure);
+        }
+
+        AssertNoFailures(failures, calls.Count);
+    }
+
+    [LiveFact]
+    public async Task Write_fields_are_described_for_the_common_entities()
+    {
+        // The tool only exists when writes are on; describing fields changes nothing.
+        await using var session = await StartAsync("--allow-writes");
+        var failures = new List<string>();
+        foreach (var entity in new[] { "Customer", "Vendor", "Invoice", "Bill", "JournalEntry", "ItemService" })
+            foreach (var operation in new[] { "create", "update" })
+            {
+                var (ok, text) = await CallAsync(session.Client, "describe_write_fields", new { entity, operation });
+                if (!ok || text.Length == 0) failures.Add($"{entity} {operation} -> {Short(text)}");
+            }
+
+        AssertNoFailures(failures, 12);
+    }
+
+    [LiveFact]
+    public async Task A_record_can_be_opened_in_quickbooks()
+    {
+        await using var session = await StartAsync();
+        var found = await CallAsync(session.Client, "search_customers", new { maxResults = 1 });
+        var id = FirstProperty(found.Text, "ListID");
+        Assert.False(id is null, $"no customer to open: {Short(found.Text)}");
+
+        var (ok, text) = await CallAsync(session.Client, "open_in_quickbooks", new { recordType = "Customer", id });
+        Assert.True(ok, Short(text));
+    }
+
     [LiveWriteFact]
     public async Task A_customer_can_be_created_changed_and_deleted_with_confirmation()
     {
@@ -247,6 +360,76 @@ public sealed class LiveQuickBooksTests
         (ok, text) = await CallAsync(client, "delete_record", new { entity = "Customer", id, confirmationToken = token });
         Assert.True(ok, text);
         Assert.Null(FirstFullName((await CallAsync(client, "search_customers", new { nameContains = name })).Text));
+
+        // QuickBooks Enterprise 24.0 only makes a deleted customer inactive, so look at inactive ones too:
+        // the customer must be gone or inactive, never still active.
+        var all = await CallAsync(client, "search_customers", new { nameContains = name, active = "all", maxResults = 1 });
+        Assert.True(all.Ok, all.Text);
+        Assert.True(FirstProperty(all.Text, "IsActive") is null or "false", $"customer is still active after delete: {Short(all.Text)}");
+    }
+
+    /// <summary>Calls a destructive tool the way a client that cannot ask the user does: preview first, then again with the token.</summary>
+    private static async Task<(bool Ok, string Text)> ConfirmedAsync(McpClient client, string tool, Dictionary<string, object?> args)
+    {
+        var (ok, text) = await CallAsync(client, tool, args);
+        if (!ok) return (ok, text);
+        args["confirmationToken"] = JsonDocument.Parse(text).RootElement.GetProperty("confirmation_token").GetString();
+        return await CallAsync(client, tool, args);
+    }
+
+    [LiveWriteFact]
+    public async Task One_customer_can_be_merged_into_another()
+    {
+        // QuickBooks refuses list merges (code 3500) unless the company file is open in single-user mode.
+        await using var session = await StartAsync("--allow-writes");
+        var client = session.Client;
+        var stamp = Guid.NewGuid().ToString("N")[..12];
+        string[] names = [$"MCP merge from {stamp}", $"MCP merge to {stamp}"];
+        var ids = new List<string>();
+        try
+        {
+            foreach (var name in names)
+            {
+                var (created, text) = await CallAsync(client, "create_list_item", new { entity = "Customer", data = new { Name = name }, idempotencyKey = name });
+                Assert.True(created, text);
+                var id = FirstProperty((await CallAsync(client, "search_customers", new { nameContains = name, maxResults = 1 })).Text, "ListID");
+                Assert.False(id is null, $"created customer '{name}' not found");
+                ids.Add(id!);
+            }
+
+            var (merged, result) = await ConfirmedAsync(client, "merge_records", new() { ["entity"] = "Customer", ["fromId"] = ids[0], ["toId"] = ids[1] });
+            Assert.True(merged, result);
+            Assert.Null(FirstFullName((await CallAsync(client, "search_customers", new { nameContains = names[0] })).Text));
+            Assert.NotNull(FirstFullName((await CallAsync(client, "search_customers", new { nameContains = names[1] })).Text));
+        }
+        finally
+        {
+            // Leave nothing behind, whichever step failed: delete whatever of the two still exists.
+            foreach (var name in names)
+            {
+                var id = FirstProperty((await CallAsync(client, "search_customers", new { nameContains = name, maxResults = 1 })).Text, "ListID");
+                if (id is not null) await ConfirmedAsync(client, "delete_record", new() { ["entity"] = "Customer", ["id"] = id });
+            }
+        }
+
+        foreach (var name in names)
+            Assert.Null(FirstFullName((await CallAsync(client, "search_customers", new { nameContains = name })).Text));
+    }
+
+    [LiveWriteFact]
+    public async Task Deleting_the_subscriptions_of_an_unknown_subscriber_is_refused_as_not_found_for_every_kind()
+    {
+        // No subscription can be created through this server, so the delete can only be exercised on a subscriber
+        // that does not exist; QuickBooks must answer 3120 (not found) for each kind, which also proves the request is accepted.
+        await using var session = await StartAsync("--allow-writes");
+        var failures = new List<string>();
+        foreach (var kind in new[] { "Data", "UI", "UIExtension", "DataEventRecoveryInfo" })
+        {
+            var (ok, text) = await ConfirmedAsync(session.Client, "delete_event_subscription", new() { ["kind"] = kind, ["subscriberId"] = Guid.NewGuid().ToString() });
+            if (ok || !text.Contains("(code 3120)", StringComparison.Ordinal)) failures.Add($"{kind} -> expected code 3120 but gave: {Short(text)}");
+        }
+
+        AssertNoFailures(failures, 4);
     }
 
     private static string? FirstFullName(string json) => FirstProperty(json, "FullName") ?? FirstProperty(json, "Name");

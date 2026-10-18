@@ -60,4 +60,34 @@ public class QbXmlTests
         var ex = Assert.Throws<QbException>(() => QbXmlResponse.Parse(xml));
         Assert.Equal(3100, ex.StatusCode);
     }
+
+    [Theory]
+    [InlineData("DataEventSubscriptionQueryRq")]
+    [InlineData("UIEventSubscriptionQueryRq")]
+    [InlineData("UIExtensionSubscriptionQueryRq")]
+    [InlineData("SubscriptionDelRq")]
+    public void Subscription_requests_use_the_subscription_envelope_without_onError(string request)
+    {
+        var root = XDocument.Parse(QbXmlRequest.Build("16.0", request, [new XElement("SubscriberID", "{00000000-0000-0000-0000-000000000000}")])).Root!;
+
+        Assert.Null(root.Element("QBXMLMsgsRq"));
+        var envelope = root.Element(QbXmlRequest.SubscriptionEnvelope)!;
+        Assert.Null(envelope.Attribute("onError"));
+        Assert.NotNull(envelope.Element(request));
+    }
+
+    [Fact]
+    public void Data_event_recovery_info_is_an_ordinary_request() =>
+        Assert.NotNull(XDocument.Parse(QbXmlRequest.Build("16.0", "DataEventRecoveryInfoQueryRq")).Root!.Element("QBXMLMsgsRq"));
+
+    [Fact]
+    public void Parse_reads_a_subscription_reply_and_treats_no_match_as_empty()
+    {
+        const string xml = """<QBXML><QBXMLSubscriptionMsgsRs><DataEventSubscriptionQueryRs statusCode="1" statusSeverity="Info" statusMessage="A query request did not find a matching object in QuickBooks" /></QBXMLSubscriptionMsgsRs></QBXML>""";
+
+        var response = QbXmlResponse.Parse(xml);
+
+        Assert.Equal(1, response.StatusCode);
+        Assert.Empty(response.Records);
+    }
 }

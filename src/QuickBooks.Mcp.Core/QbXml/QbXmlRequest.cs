@@ -19,6 +19,14 @@ public static class QbXmlRequest
             .FirstOrDefault().Text
         ?? throw new InvalidOperationException("No supported qbXML version is installed.");
 
+    /// <summary>The wrapper element subscription requests use instead of <c>QBXMLMsgsRq</c>; QuickBooks refuses them any other way.</summary>
+    public const string SubscriptionEnvelope = "QBXMLSubscriptionMsgsRq";
+
+    // Data event, UI event and UI extension subscriptions (add, query, delete) go through ProcessSubscription.
+    // Data event recovery info is an ordinary request.
+    private static bool IsSubscriptionRequest(string requestName) =>
+        requestName.Contains("Subscription", StringComparison.Ordinal);
+
     /// <summary>
     /// Builds one request, e.g. <c>CustomerQueryRq</c> with the given child elements in order.
     /// Pass <paramref name="iterator"/> ("Start", "Continue" or "Stop") to page large results.
@@ -40,9 +48,11 @@ public static class QbXmlRequest
             new XDeclaration("1.0", null, null),
             new XProcessingInstruction("qbxml", $"version=\"{version}\""),
             new XElement("QBXML",
-                new XElement("QBXMLMsgsRq",
-                    new XAttribute("onError", continueOnError ? "continueOnError" : "stopOnError"),
-                    request)));
+                IsSubscriptionRequest(requestName)
+                    ? new XElement(SubscriptionEnvelope, request)
+                    : new XElement("QBXMLMsgsRq",
+                        new XAttribute("onError", continueOnError ? "continueOnError" : "stopOnError"),
+                        request)));
         return doc.Declaration + Environment.NewLine + string.Concat(doc.Nodes());
     }
 }

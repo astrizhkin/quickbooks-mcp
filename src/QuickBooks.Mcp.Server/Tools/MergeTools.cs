@@ -20,7 +20,7 @@ public sealed class MergeTools(IQbClient qb, WriteExecutor executor)
 
     /// <summary>Merges one list item into another.</summary>
     [McpServerTool(Name = "merge_records", ReadOnly = false, Destructive = true)]
-    [Description("Merge a list item into another of the same type; the first is deleted and its transactions move to the second. The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.")]
+    [Description("Merge a list item into another of the same type; the first is deleted and its transactions move to the second; QuickBooks must be in single-user mode. The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.")]
     public Task<string> Merge(
         [Description("Entity type, e.g. Customer, Vendor, Account, ItemService.")] string entity,
         [Description("ListID of the record to merge away (it is deleted).")] string fromId,

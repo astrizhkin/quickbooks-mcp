@@ -14,7 +14,7 @@ public sealed class DeleteTools(WriteExecutor executor)
 
     /// <summary>Deletes a list item or a transaction.</summary>
     [McpServerTool(Name = "delete_record", ReadOnly = false, Destructive = true)]
-    [Description("Permanently delete a list item or a transaction (prefer void_transaction). The user is asked to approve; If the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.")]
+    [Description("Delete a list item or a transaction (prefer void_transaction); QuickBooks may only make a list item inactive. The user is asked to approve; if the client cannot ask the user, the first call returns a preview and a confirmation_token to pass on a second call.")]
     public Task<string> Delete(
         [Description("Entity type, e.g. Customer, Vendor, ItemService, Invoice, Bill, Check.")] string entity,
         [Description("ListID or TxnID of the record.")] string id,

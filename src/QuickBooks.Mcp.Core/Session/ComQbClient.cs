@@ -53,7 +53,10 @@ public sealed class ComQbClient(QbOptions options) : IQbClient
             ticket = (string)rp.BeginSession(options.CompanyFile ?? "", (int)options.Mode);
 
             var versions = ((object[])rp.QBXMLVersionsForSession(ticket)).Cast<string>();
-            return (string)rp.ProcessRequest(ticket, buildRequest(QbXmlRequest.PickVersion(versions)));
+            var request = buildRequest(QbXmlRequest.PickVersion(versions));
+            return request.Contains("<" + QbXmlRequest.SubscriptionEnvelope, StringComparison.Ordinal)
+                ? (string)rp.ProcessSubscription(request)
+                : (string)rp.ProcessRequest(ticket, request);
         }
         finally
         {

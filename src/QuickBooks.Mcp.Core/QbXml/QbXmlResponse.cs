@@ -29,7 +29,8 @@ public sealed class QbXmlResponse
     /// </summary>
     public static QbXmlResponse Parse(string xml)
     {
-        var rs = XDocument.Parse(xml).Root?.Element("QBXMLMsgsRs")?.Elements().FirstOrDefault()
+        var root = XDocument.Parse(xml).Root;
+        var rs = (root?.Element("QBXMLMsgsRs") ?? root?.Element("QBXMLSubscriptionMsgsRs"))?.Elements().FirstOrDefault()
             ?? throw new FormatException("Reply has no QBXMLMsgsRs response element.");
 
         var code = int.Parse(rs.Attribute("statusCode")?.Value ?? "0", CultureInfo.InvariantCulture);
