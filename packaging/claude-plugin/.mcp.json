@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "quickbooks": {
+      "command": "npx",
+      "args": ["-y", "@devwithmj/quickbooks-mcp@0.1.4"],
+      "env": { "QB_COMPANY_FILE": "${user_config.company_file}" }
+    }
+  }
+}
