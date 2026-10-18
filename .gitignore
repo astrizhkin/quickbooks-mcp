@@ -3,6 +3,7 @@
 Interop.QBFC*.dll
 
 bin/
+!packaging/npm/bin/
 obj/
 node_modules/
 *.qbw
