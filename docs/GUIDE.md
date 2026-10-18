@@ -76,7 +76,7 @@ claude mcp add quickbooks -e QB_COMPANY_FILE="C:\Books\Company.qbw" -- npx -y @d
 - "Find invoices to Acme from last quarter."
 - "Profit and loss for last month by class, as a table."
 
-Tools and their parameters are listed in [TOOLS.md](TOOLS.md).
+Tools and their parameters are listed in [TOOLS.md](TOOLS.md). To reach your books from a client that is not on this computer, see [REMOTE-ACCESS.md](REMOTE-ACCESS.md).
 
 ## 5. Turning on changes
 

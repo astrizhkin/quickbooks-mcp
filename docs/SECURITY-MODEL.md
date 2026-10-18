@@ -31,7 +31,7 @@ AI app (Claude, VS Code, ...)  <--stdio-->  quickbooks-mcp  <--local COM-->  Qui
 | Card data | never accepted for writing, masked on reading, no switch | none (see [the decision](design/credit-card-processing.md)) |
 | Result size | pages capped at about 100k characters with a cursor | none |
 | Input checking | unknown fields refused; requests are built by the server, never pasted as raw XML | none |
-| Local only | no network, no service, no remote mode | see [the remote-use note](design/events-and-web-connector.md) |
+| Local only | no network, no service, no remote mode in the server itself | see [the remote-use note](design/events-and-web-connector.md); a private tunnel you run yourself is described in [REMOTE-ACCESS.md](REMOTE-ACCESS.md) |
 
 QuickBooks itself still applies its own permissions: the server acts as the QuickBooks user you authorized, so it cannot do more than that user can.
 
