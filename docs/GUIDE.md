@@ -78,21 +78,6 @@ env = { QB_COMPANY_FILE = 'C:\Books\Company.qbw' }
 
 Or from a terminal: `codex mcp add quickbooks --env QB_COMPANY_FILE="C:\Books\Company.qbw" -- C:\Tools\quickbooks-mcp.exe`. Add `"--allow-writes"` to `args` only if you want changes. The ChatGPT website cannot run local servers; see [REMOTE-ACCESS.md](REMOTE-ACCESS.md) for a private link.
 
-**Gemini CLI** (`%USERPROFILE%\.gemini\settings.json`, or `.gemini/settings.json` in a project):
-
-```json
-{
-  "mcpServers": {
-    "quickbooks": {
-      "command": "C:\\Tools\\quickbooks-mcp.exe",
-      "env": { "QB_COMPANY_FILE": "C:\\Books\\Company.qbw" }
-    }
-  }
-}
-```
-
-**Other clients and models.** The server speaks standard MCP over stdio, so any client that can start a local stdio server can use it, whichever model sits behind the client. That includes editors and apps such as Windsurf, Cline, Continue, LM Studio, Jan and Open WebUI, which is also how to use models such as DeepSeek that have no desktop app of their own. These are listed because they accept stdio servers; only the clients named above have been described step by step. Browser-only chat apps cannot start local programs; see [REMOTE-ACCESS.md](REMOTE-ACCESS.md).
-
 **Anything else:** the command is `npx -y @devwithmj/quickbooks-mcp` (or the `.exe` path), speaking MCP over stdio. To use the downloaded exe directly, set `"command"` to its path and drop `args`.
 
 ## 4. Try it
