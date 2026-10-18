@@ -50,5 +50,43 @@ Errors, with the exact text:
 
 If something fails, also run `C:\Tools\quickbooks-mcp-win-x64.exe --diagnostics` and paste the output. It has versions and settings and no company data.
 
+## Multi-currency test (optional)
+Multi-currency is the least tested part. If you have a company file that already uses it, or a throwaway file you can turn it on in, this adds a useful row to the report.
+
+**Safety first**
+- Use a throwaway or sample file, never your real books. Turning multi-currency on in QuickBooks (Edit > Preferences > Multiple Currencies) cannot be undone for that file.
+- Leave writes off. Everything below only reads.
+- The edition must support it (Premier or Enterprise). On other editions QuickBooks answers with code 3250, which is expected.
+
+**Set up the file** (skip if it already has foreign-currency records)
+1. In single-user mode turn multi-currency on and pick a home currency.
+2. Add one foreign currency (Lists > Currency List) and note its exchange rate.
+3. Create one customer and one vendor in that currency, then one invoice for the customer and one bill from the vendor, each with an amount you will recognise (for example 1,000.00).
+
+**Ask**
+1. "Is multi-currency turned on, and what is the home currency?"
+2. "List my currencies."
+3. "Show the invoice for [the foreign customer]. What currency is it in, and what is the amount in the home currency?"
+4. "List my customers" and check the foreign customer shows its currency.
+5. "What are my unpaid bills? Add up the totals, and say which currency each is in."
+6. "Show accounts receivable aging." Reports are in the home currency, so the foreign invoice should appear at its home-currency value.
+
+**What to check**
+- Each foreign record's amount is in its own currency, and any field ending in `InHomeCurrency` matches what QuickBooks shows in the home currency.
+- The answer states the home currency and does not add foreign and home amounts together as if they were the same.
+- Results that hold foreign records carry a `currency` note with the home currency. Records in the home currency only do not.
+- The A/R aging total matches QuickBooks (Reports > Customers & Receivables > A/R Aging Summary).
+
+**Add to your report**
+```
+Multi-currency on: yes / no
+Home currency and foreign currency used:
+Invoice amount shown by QuickBooks (foreign / home):
+Invoice amount shown by the assistant (foreign / home):
+Was the currency named correctly: yes / no
+Did the A/R aging total match: yes / no
+Errors, with the exact text:
+```
+
 ## Known limits (not a failure)
 Some requests are refused by QuickBooks itself on some editions, for example inventory sites and multi-currency on editions without them. The error text says so (codes 3231 or 3250). Mention them, but they are not bugs.
