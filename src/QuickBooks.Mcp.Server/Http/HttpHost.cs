@@ -16,7 +16,7 @@ public static class HttpHost
     {
         var builder = WebApplication.CreateBuilder(args);
         ServerHost.Configure(builder, config);
-        builder.WebHost.UseUrls($"http://127.0.0.1:{config.HttpPort}");
+        builder.WebHost.UseUrls($"http://{config.HttpBind}:{config.HttpPort}");
         builder.Services.AddQuickBooksMcp(config).WithHttpTransport();
         configureServices?.Invoke(builder.Services);
 
@@ -41,7 +41,8 @@ public static class HttpHost
     {
         var key = HttpAccess.ResolveKey(config.HttpKey, HttpAccess.KeyFilePath);
         var app = Build(config, key, args);
-        Console.Error.WriteLine($"quickbooks-mcp is serving MCP at http://127.0.0.1:{config.HttpPort}/mcp (this computer only).");
+        Console.Error.WriteLine($"quickbooks-mcp is serving MCP at http://{config.HttpBind}:{config.HttpPort}/mcp"
+            + (config.HttpBind is "127.0.0.1" or "localhost" ? " (this computer only)." : " (every network; the access key guards every request)."));
         Console.Error.WriteLine(config.HttpKey is null
             ? $"Access key: {key}  (saved in {HttpAccess.KeyFilePath})"
             : "Access key: the one in QB_HTTP_KEY.");

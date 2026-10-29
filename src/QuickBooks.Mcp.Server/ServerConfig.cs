@@ -17,7 +17,7 @@ public sealed class ConfigException(string message) : Exception(message);
 public sealed class ServerConfig
 {
     private static readonly string[] Keys =
-        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL", "LOG_FILE", "CACHE_SECONDS", "CONFIRM_WRITES", "HTTP", "HTTP_PORT", "HTTP_KEY", "HTTP_ALLOW_WRITES"];
+        ["COMPANY_FILE", "MODE", "ALLOW_WRITES", "ENABLE_WRITE", "ENABLE_UPDATE", "ENABLE_DELETE", "WRITE_ALLOW", "AUDIT_LOG", "ALLOW_PAYROLL", "REDACT", "TIMEOUT_SECONDS", "MAX_RETRIES", "LOG_LEVEL", "LOG_FILE", "CACHE_SECONDS", "CONFIRM_WRITES", "HTTP", "HTTP_PORT", "HTTP_BIND", "HTTP_KEY", "HTTP_ALLOW_WRITES"];
 
     /// <summary>Connection settings passed to the QuickBooks client.</summary>
     public required QbOptions Qb { get; init; }
@@ -49,11 +49,14 @@ public sealed class ServerConfig
     /// <summary>Optional file to append log lines to, besides stderr. Logs hold no company data.</summary>
     public string? LogFile { get; init; }
 
-    /// <summary>Serve MCP over HTTP on this computer's loopback address instead of stdio. Every request needs the access key.</summary>
+    /// <summary>Serve MCP over HTTP instead of stdio. Listens on loopback unless <c>HTTP_BIND</c> says otherwise. Every request needs the access key.</summary>
     public bool Http { get; init; }
 
-    /// <summary>The loopback port for <see cref="Http"/>.</summary>
+    /// <summary>The port for <see cref="Http"/>.</summary>
     public int HttpPort { get; init; } = 8765;
+
+    /// <summary>The address HTTP mode listens on. Loopback by default; 0.0.0.0 serves the whole network (the access key still guards every request).</summary>
+    public string HttpBind { get; init; } = "127.0.0.1";
 
     /// <summary>The access key for <see cref="Http"/>; null means use (or create) the key file.</summary>
     public string? HttpKey { get; init; }
@@ -95,6 +98,7 @@ public sealed class ServerConfig
             Writes = writes,
             Http = http,
             HttpPort = ParseInt(values, "HTTP_PORT", 8765, 1),
+            HttpBind = values.GetValueOrDefault("HTTP_BIND", "127.0.0.1"),
             HttpKey = values.GetValueOrDefault("HTTP_KEY"),
             WriteAllow = values.TryGetValue("WRITE_ALLOW", out var allow)
                 ? allow.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
