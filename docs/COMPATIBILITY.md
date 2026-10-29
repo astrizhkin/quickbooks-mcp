@@ -21,7 +21,7 @@ Legend: **pass**, **partial** (say what failed), **fail**, *untested*.
 |---|---|---|---|---|---|---|---|
 | Pro | 2022 | | | *untested* | *untested* | *untested* | |
 | Pro | 2023 | | | *untested* | *untested* | *untested* | |
-| Pro | 2024 | | | *untested* | *untested* | *untested* | |
+| Pro | 2024 | 17.0 | 64-bit | pass | pass | *untested* | Sample company file (Larry's Landscaping), Windows 11. Every read tool, all four reports and the write round-trip (create invoice → idempotent replay → void behind the confirmation token) pass in single-user and multi-user mode; bogus and reused confirmation tokens are refused, and a wrong write field name is refused by the schema before anything is sent. Multi-user needs a QuickBooks user (create one when the login dialog appears). Not run with QuickBooks closed. |
 | Premier | 2022 | | | *untested* | *untested* | *untested* | |
 | Premier | 2023 | | | *untested* | *untested* | *untested* | |
 | Premier | 2024 | | | *untested* | *untested* | *untested* | |

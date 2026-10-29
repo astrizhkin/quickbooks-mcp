@@ -2,6 +2,9 @@
 
 For QuickBooks Desktop (Pro, Premier, Enterprise) on Windows. The server runs on the same computer as QuickBooks, started by your AI app, and reads the company file through QuickBooks' own SDK. Nothing is uploaded anywhere by this server; what the AI app sees is what the tools return (see [SECURITY-MODEL.md](SECURITY-MODEL.md)).
 
+Step-by-step deployment runbook — starting the server, authorization, access keys, LAN
+binding and firewall, agent configs: [DEPLOY.md](DEPLOY.md).
+
 ## 1. Install
 
 Pick one.

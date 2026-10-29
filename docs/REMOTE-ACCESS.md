@@ -35,7 +35,7 @@ OpenAI limits a tunnel to 600 requests a minute and 120 seconds per request, whi
 
 ## Option 2: the built-in HTTP mode with a Cloudflare tunnel (any client)
 
-Use this for clients that accept a remote MCP address. The server can speak MCP over HTTP itself, so there is no bridge to install. It listens only on this computer (`127.0.0.1`), and every request must carry an access key.
+Use this for clients that accept a remote MCP address. The server can speak MCP over HTTP itself, so there is no bridge to install. It listens only on this computer (`127.0.0.1`) unless you pass `--http-bind 0.0.0.0` (LAN — see [DEPLOY.md](DEPLOY.md)), and every request must carry an access key.
 
 1. **Start it.** The first run makes a random key and saves it next to the audit log; later runs reuse it.
 
